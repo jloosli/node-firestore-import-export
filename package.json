@@ -1,0 +1,14 @@
+{
+  "name": "node-firestore-backup-restore",
+  "version": "1.0.0",
+  "description": "Firestore backup and restoration",
+  "main": "./dist/index.js",
+  "repository": "https://github.com/jloosli/node-firestore-backup-restore",
+  "author": "Jared Loosli <jloosli@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "colors": "^1.1.2",
+    "commander": "^2.14.1",
+    "firebase-admin": "^5.9.1"
+  }
+}
