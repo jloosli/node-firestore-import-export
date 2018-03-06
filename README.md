@@ -1,8 +1,7 @@
 # node-firestore-import-export
 Firestore data backup and restoration
 
-[![codebeat badge](https://codebeat.co/badges/9a16b476-8ffe-4178-8652-15d393ff70ae)](https://codebeat.co/projects/github-com-jloosli-node-firestore-import-export-master)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/2ea2abb4fa0f47d383a4a7221cfae4e8)](https://www.codacy.com/app/jloosli/node-firestore-import-export?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jloosli/node-firestore-import-export&amp;utm_campaign=Badge_Grade)
+[![codebeat badge](https://codebeat.co/badges/c7db349c-8de5-4b49-b366-55a0448eb18a)](https://codebeat.co/projects/github-com-jloosli-node-firestore-import-export-master)[![Codacy Badge](https://api.codacy.com/project/badge/Grade/2ea2abb4fa0f47d383a4a7221cfae4e8)](https://www.codacy.com/app/jloosli/node-firestore-import-export?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jloosli/node-firestore-import-export&amp;utm_campaign=Badge_Grade)
 [![David badge](https://david-dm.org/jloosli/node-firestore-import-export.svg)](https://david-dm.org/jloosli/node-firestore-import-export.svg)
 [![Known Vulnerabilities](https://snyk.io/test/github/jloosli/node-firestore-import-export/badge.svg)](https://snyk.io/test/github/jloosli/node-firestore-import-export)
 
