@@ -17,9 +17,10 @@
     "url": "https://github.com/jloosli/node-firestore-import-export/issues"
   },
   "scripts": {
-    "export": "./dist/bin/export.js",
-    "import": "./dist/bin/import.js",
-    "build": "tsc"
+    "export": "./dist/bin/firestore-export.js",
+    "import": "./dist/bin/firestore-import.js",
+    "build": "tsc",
+    "watch": "tsc -w"
   },
   "bin": {
     "export": "./dist/bin/export.js",
@@ -27,10 +28,13 @@
   },
   "dependencies": {
     "@google-cloud/firestore": "^0.12.0",
+    "@types/load-json-file": "^2.0.7",
     "colors": "^1.2.0-rc0",
     "commander": "^2.14.1",
+    "core-js": "^2.5.3",
     "firebase-admin": "^5.9.1",
-    "firebase-functions": "^0.8.1"
+    "firebase-functions": "^0.8.1",
+    "load-json-file": "^4.0.0"
   },
   "devDependencies": {
     "@types/core-js": "^0.9.46",

@@ -31,6 +31,8 @@ node_modules/
 
 # Data
 *.json
+!package.json
+!tsconfig.json
 
 # Dist
 dist/**

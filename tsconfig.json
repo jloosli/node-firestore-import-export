@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6",
+    "sourceMap": false,
+    "strict": true,
+    "declaration": true,
+    "outDir": "./dist/",
+    "rootDirs": [
+      "./src/bin",
+      "./src/lib"
+    ],
+    "lib": [
+      "es6",
+      "es2015",
+      "es2017",
+      "dom"
+    ],
+    "typeRoots": [
+      "node_modules/@types",
+      "./@types"
+    ]
+  },
+  "include": [
+    "src/bin/firestore-export.ts",
+    "src/lib/export.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
+  "compileOnSave": true
+}

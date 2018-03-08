@@ -1,14 +1,5 @@
-#!/usr/bin/env node
 import * as admin from 'firebase-admin';
-
-const credentials = require('./credentials.json');
-import fs = require('fs');
-
-admin.initializeApp({
-    credential: admin.credential.cert(credentials),
-    databaseURL: "https://tcs-appointments.firebaseio.com"
-});
-const db = admin.firestore();
+import loadJsonFile = require("load-json-file");
 
 const SLEEP_TIME = 1000;
 
@@ -16,6 +7,16 @@ const isDocument = (ref: admin.firestore.Firestore |
     FirebaseFirestore.DocumentReference |
     FirebaseFirestore.CollectionReference): ref is FirebaseFirestore.DocumentReference => {
     return (<FirebaseFirestore.DocumentReference>ref).collection !== undefined;
+};
+
+let db: admin.firestore.Firestore;
+const initialize = (credentials: admin.ServiceAccount) => {
+    admin.initializeApp({
+        credential: admin.credential.cert(credentials),
+        databaseURL: `https://${credentials.project_id}.firebaseio.com`
+    });
+
+    db = admin.firestore();
 };
 
 const exportData = async (startingRef: admin.firestore.Firestore |
@@ -85,7 +86,7 @@ const getDocuments = async (collectionRef: FirebaseFirestore.CollectionReference
         }));
     });
     (await Promise.all(documentPromises))
-        .map((res:any) => {
+        .map((res: any) => {
             console.log(res);
             for (let key in res) {
                 (<any>results)[key] = res[key];
@@ -96,32 +97,42 @@ const getDocuments = async (collectionRef: FirebaseFirestore.CollectionReference
 
 const sleep = (timeInMS: number): Promise<void> => new Promise(resolve => setTimeout(resolve, timeInMS));
 
-const writeResults = (results: object, filename: string) => {
-    const content = JSON.stringify(results);
-    fs.writeFile(filename, content, 'utf8', err => {
-        if (err) {
-            return console.log(err);
-        }
-        console.log(`Results were saved to ${filename}`);
-    })
-};
 
-const coll = 'organizations';
-exportData()
-    .then(res => {
-        console.log('Received Results');
-        // console.log(res);
-        return res;
-    })
-    .then(res => {
-        const obj: any = {};
-        obj[coll] = res;
-        writeResults(obj, 'organizations.json')
-    })
-    .catch(res => {
-        console.error(res);
-        writeResults(res, 'export.json');
-    });
+// const coll = 'organizations';
+// exportData()
+//     .then(res => {
+//         console.log('Received Results');
+//         // console.log(res);
+//         return res;
+//     })
+//     .then(res => {
+//         const obj: any = {};
+//         obj[coll] = res;
+//         writeResults(obj, 'organizations.json')
+//     })
+//     .catch(res => {
+//         console.error(res);
+//         writeResults(res, 'export.json');
+//     });
 
 // @todo: See https://codeburst.io/https-chidume-nnamdi-com-npm-module-in-typescript-12b3b22f0724
-export default exportData;
+
+const commandLine = (credentialsPath: string, dataPath?: string | null) => {
+    return loadJsonFile(credentialsPath)
+        .then((credentials: admin.ServiceAccount) => {
+            initialize(credentials);
+            let startingRef;
+            if (dataPath) {
+                const parts = dataPath.split('/').length;
+                const isDoc = parts % 2 === 0;
+                startingRef = isDoc ? db.doc(dataPath) : db.collection(dataPath);
+            } else {
+                startingRef = db;
+            }
+            return exportData(startingRef)
+        })
+        .catch(err => {
+            throw new Error("Credentials file not found");
+        });
+};
+export default commandLine;
