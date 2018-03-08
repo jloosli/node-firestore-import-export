@@ -41,7 +41,7 @@ const getCollections = async (startingRef: admin.firestore.Firestore | FirebaseF
             deadlineError = false;
         } catch (e) {
             if (e.message === 'Deadline Exceeded') {
-                console.log("Deadline Error in getCollections()");
+                console.log(`Deadline Error in getCollections()...waiting ${SLEEP_TIME/1000} second(s) before retrying`);
                 await sleep(SLEEP_TIME);
                 deadlineError = true;
             }
@@ -68,7 +68,7 @@ const getDocuments = async (collectionRef: FirebaseFirestore.CollectionReference
             deadlineError = false;
         } catch (e) {
             if (e.message === 'Deadline Exceeded') {
-                console.log('Deadline Error in getDocuments');
+                console.log(`Deadline Error in getCollections()...waiting ${SLEEP_TIME/1000} second(s) before retrying`);
                 await sleep(SLEEP_TIME);
                 deadlineError = true;
             }
@@ -96,24 +96,6 @@ const getDocuments = async (collectionRef: FirebaseFirestore.CollectionReference
 };
 
 const sleep = (timeInMS: number): Promise<void> => new Promise(resolve => setTimeout(resolve, timeInMS));
-
-
-// const coll = 'organizations';
-// exportData()
-//     .then(res => {
-//         console.log('Received Results');
-//         // console.log(res);
-//         return res;
-//     })
-//     .then(res => {
-//         const obj: any = {};
-//         obj[coll] = res;
-//         writeResults(obj, 'organizations.json')
-//     })
-//     .catch(res => {
-//         console.error(res);
-//         writeResults(res, 'export.json');
-//     });
 
 // @todo: See https://codeburst.io/https-chidume-nnamdi-com-npm-module-in-typescript-12b3b22f0724
 

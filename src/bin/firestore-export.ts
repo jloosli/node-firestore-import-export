@@ -2,10 +2,11 @@
 import * as commander from 'commander';
 
 import * as colors from 'colors';
-const packageInfo = require('../../package.json');
 import * as process from 'process';
 import * as fs from 'fs';
 import firestoreExport from '../lib/export';
+
+const packageInfo = require('../../package.json');
 
 const accountCredentialsPathParamKey = 'accountCredentials';
 const accountCredentialsPathParamDescription = 'Google Cloud account credentials JSON file';
@@ -46,18 +47,6 @@ if (!backupPath) {
     process.exit(1);
 }
 
-const prettyPrint = commander[prettyPrintParamKey] !== undefined && commander[prettyPrintParamKey] !== null
-const nodePath = commander[nodePathParamKey];
-try {
-    firestoreExport(accountCredentialsPath, nodePath)
-        .then(() => {
-            console.log(colors.bold(colors.green('All done 💫')));
-        })
-} catch (error) {
-    console.log(colors.red(error));
-    process.exit(1);
-}
-
 const writeResults = (results: object, filename: string) => {
     const content = JSON.stringify(results);
     fs.writeFile(filename, content, 'utf8', err => {
@@ -67,3 +56,26 @@ const writeResults = (results: object, filename: string) => {
         console.log(`Results were saved to ${filename}`);
     })
 };
+
+const prettyPrint = commander[prettyPrintParamKey] !== undefined && commander[prettyPrintParamKey] !== null
+const nodePath = commander[nodePathParamKey];
+firestoreExport(accountCredentialsPath, nodePath)
+    .then(results => {
+        let stringResults;
+        if (prettyPrint) {
+            stringResults = JSON.stringify(results, null, 2);
+        } else {
+            stringResults = JSON.stringify(results);
+        }
+        return stringResults;
+    })
+    .then((dataToWrite: string) => writeResults(dataToWrite, backupPath))
+    .then(() => {
+        console.log(colors.bold(colors.green('All done 💫')));
+    })
+    .catch((error) => {
+        console.log(colors.red(error));
+        process.exit(1);
+    });
+
+
