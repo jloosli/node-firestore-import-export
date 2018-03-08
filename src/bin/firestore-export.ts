@@ -12,7 +12,10 @@ const accountCredentialsPathParamKey = 'accountCredentials';
 const accountCredentialsPathParamDescription = 'Google Cloud account credentials JSON file';
 
 const backupPathParamKey = 'backupPath';
-const backupPathParamDescription = 'File Path to store backup.';
+const backupPathParamDescription = 'Filename to store backup. (e.g. backups/full-backup.json)';
+
+const depthParamKey = 'depth';
+const depthParamDescription = 'Depth of backup';
 
 const nodePathParamKey = 'nodePath';
 const nodePathParamDescription = 'Path to database node to start (e.g. collectionA/docB/collectionC). Backs up entire database if missing';
@@ -23,8 +26,9 @@ const prettyPrintParamDescription = 'JSON backups done with pretty-printing.';
 commander.version(packageInfo.version)
     .option(`-a, --${accountCredentialsPathParamKey} <path>`, accountCredentialsPathParamDescription)
     .option(`-b, --${backupPathParamKey} <path>`, backupPathParamDescription)
+    .option(`-d, --${depthParamKey}`, depthParamDescription)
     .option(`-n, --${nodePathParamKey} <path>`, nodePathParamDescription)
-    .option(`-P, --${prettyPrintParamKey}`, prettyPrintParamDescription)
+    .option(`-p, --${prettyPrintParamKey}`, prettyPrintParamDescription)
     .parse(process.argv);
 
 const accountCredentialsPath = commander[accountCredentialsPathParamKey];
@@ -40,16 +44,15 @@ if (!fs.existsSync(accountCredentialsPath)) {
     process.exit(1)
 }
 
-const backupPath = commander[backupPathParamKey];
+const backupPath = commander[backupPathParamKey] || 'firebase-export.json';
 if (!backupPath) {
     console.log(colors.bold(colors.red('Missing: ')) + colors.bold(backupPathParamKey) + ' - ' + backupPathParamDescription);
     commander.help();
     process.exit(1);
 }
 
-const writeResults = (results: object, filename: string) => {
-    const content = JSON.stringify(results);
-    fs.writeFile(filename, content, 'utf8', err => {
+const writeResults = (results: string, filename: string) => {
+    fs.writeFile(filename, results, 'utf8', err => {
         if (err) {
             return console.log(err);
         }
@@ -57,7 +60,7 @@ const writeResults = (results: object, filename: string) => {
     })
 };
 
-const prettyPrint = commander[prettyPrintParamKey] !== undefined && commander[prettyPrintParamKey] !== null
+const prettyPrint = commander[prettyPrintParamKey] !== undefined && commander[prettyPrintParamKey] !== null;
 const nodePath = commander[nodePathParamKey];
 firestoreExport(accountCredentialsPath, nodePath)
     .then(results => {

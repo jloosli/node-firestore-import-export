@@ -41,7 +41,7 @@ const getCollections = async (startingRef: admin.firestore.Firestore | FirebaseF
             deadlineError = false;
         } catch (e) {
             if (e.message === 'Deadline Exceeded') {
-                console.log(`Deadline Error in getCollections()...waiting ${SLEEP_TIME/1000} second(s) before retrying`);
+                console.log(`Deadline Error in getCollections()...waiting ${SLEEP_TIME / 1000} second(s) before retrying`);
                 await sleep(SLEEP_TIME);
                 deadlineError = true;
             }
@@ -68,7 +68,7 @@ const getDocuments = async (collectionRef: FirebaseFirestore.CollectionReference
             deadlineError = false;
         } catch (e) {
             if (e.message === 'Deadline Exceeded') {
-                console.log(`Deadline Error in getCollections()...waiting ${SLEEP_TIME/1000} second(s) before retrying`);
+                console.log(`Deadline Error in getCollections()...waiting ${SLEEP_TIME / 1000} second(s) before retrying`);
                 await sleep(SLEEP_TIME);
                 deadlineError = true;
             }
@@ -81,7 +81,10 @@ const getDocuments = async (collectionRef: FirebaseFirestore.CollectionReference
             const docDetails: any = {};
             console.log(docSnapshot.id, '=>', docSnapshot.data());
             docDetails[docSnapshot.id] = docSnapshot.data();
-            docDetails[docSnapshot.id]['__collections__'] = await getCollections(docSnapshot.ref);
+            const collections = await getCollections(docSnapshot.ref);
+            if (Object.keys(collections).length > 1 && collections.constructor === Object) {
+                docDetails[docSnapshot.id]['__collections__'] = collections;
+            }
             resolve(docDetails);
         }));
     });
@@ -89,15 +92,15 @@ const getDocuments = async (collectionRef: FirebaseFirestore.CollectionReference
         .map((res: any) => {
             console.log(res);
             for (let key in res) {
-                (<any>results)[key] = res[key];
+                if (res.hasOwnProperty(key)) {
+                    (<any>results)[key] = res[key];
+                }
             }
         });
     return results;
 };
 
 const sleep = (timeInMS: number): Promise<void> => new Promise(resolve => setTimeout(resolve, timeInMS));
-
-// @todo: See https://codeburst.io/https-chidume-nnamdi-com-npm-module-in-typescript-12b3b22f0724
 
 const commandLine = (credentialsPath: string, dataPath?: string | null) => {
     return loadJsonFile(credentialsPath)
