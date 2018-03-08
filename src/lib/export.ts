@@ -19,14 +19,18 @@ const initialize = (credentials: admin.ServiceAccount) => {
     db = admin.firestore();
 };
 
-const exportData = async (startingRef: admin.firestore.Firestore |
+const exportData = async (startingRef?: admin.firestore.Firestore |
                               FirebaseFirestore.DocumentReference |
                               FirebaseFirestore.CollectionReference |
                               null = null,
-                          depth = null) => {
+                          depth? = null) => {
     startingRef = startingRef || db;
     if (isDocument(startingRef)) {
-        return await getCollections(startingRef);
+        const collectionsPromise = getCollections(startingRef);
+        const dataPromise = startingRef.get().then(snapshot=>snapshot.data());
+        return await Promise.all([collectionsPromise, dataPromise]).then(res=> {
+            return Object.assign({}, {'__collections__' : res[0]}, res[1]);
+        });
     }
     else {
         return await getDocuments(<FirebaseFirestore.CollectionReference>startingRef);
@@ -82,9 +86,9 @@ const getDocuments = async (collectionRef: FirebaseFirestore.CollectionReference
             console.log(docSnapshot.id, '=>', docSnapshot.data());
             docDetails[docSnapshot.id] = docSnapshot.data();
             const collections = await getCollections(docSnapshot.ref);
-            if (Object.keys(collections).length > 1 && collections.constructor === Object) {
+            // if (Object.keys(collections).length > 1 && collections.constructor === Object) {
                 docDetails[docSnapshot.id]['__collections__'] = collections;
-            }
+            // }
             resolve(docDetails);
         }));
     });

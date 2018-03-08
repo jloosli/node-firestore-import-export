@@ -4,7 +4,8 @@ import * as commander from 'commander';
 import * as colors from 'colors';
 import * as process from 'process';
 import * as fs from 'fs';
-import firestoreExport from '../lib/export';
+import firestoreImport from '../lib/import';
+import loadJsonFile = require("load-json-file");
 
 const packageInfo = require('../../package.json');
 
@@ -14,21 +15,14 @@ const accountCredentialsPathParamDescription = 'Google Cloud account credentials
 const backupFileParamKey = 'backupFile';
 const backupFileParamDescription = 'Filename to store backup. (e.g. backups/full-backup.json)';
 
-const depthParamKey = 'depth';
-const depthParamDescription = 'Depth of backup';
-
 const nodePathParamKey = 'nodePath';
-const nodePathParamDescription = 'Path to database node to start (e.g. collectionA/docB/collectionC). Backs up entire database if missing';
-
-const prettyPrintParamKey = 'prettyPrint';
-const prettyPrintParamDescription = 'JSON backups done with pretty-printing.';
+const nodePathParamDescription = 'Path to database node (has to be a collection) where import will to start (e.g. collectionA/docB/collectionC).' +
+    ' Imports at root level if missing.';
 
 commander.version(packageInfo.version)
     .option(`-a, --${accountCredentialsPathParamKey} <path>`, accountCredentialsPathParamDescription)
     .option(`-b, --${backupFileParamKey} <path>`, backupFileParamDescription)
-    .option(`-d, --${depthParamKey}`, depthParamDescription)
     .option(`-n, --${nodePathParamKey} <path>`, nodePathParamDescription)
-    .option(`-p, --${prettyPrintParamKey}`, prettyPrintParamDescription)
     .parse(process.argv);
 
 const accountCredentialsPath = commander[accountCredentialsPathParamKey];
@@ -44,35 +38,22 @@ if (!fs.existsSync(accountCredentialsPath)) {
     process.exit(1)
 }
 
-const backupPath = commander[backupFileParamKey] || 'firebase-export.json';
-if (!backupPath) {
+const backupFile = commander[backupFileParamKey];
+if (!backupFile) {
     console.log(colors.bold(colors.red('Missing: ')) + colors.bold(backupFileParamKey) + ' - ' + backupFileParamDescription);
     commander.help();
     process.exit(1);
 }
 
-const writeResults = (results: string, filename: string) => {
-    fs.writeFile(filename, results, 'utf8', err => {
-        if (err) {
-            return console.log(err);
-        }
-        console.log(`Results were saved to ${filename}`);
-    })
-};
+if (!fs.existsSync(backupFile)) {
+    console.log(colors.bold(colors.red('Backup file does not exist: ')) + colors.bold(backupFile));
+    commander.help();
+    process.exit(1)
+}
 
-const prettyPrint = commander[prettyPrintParamKey] !== undefined && commander[prettyPrintParamKey] !== null;
 const nodePath = commander[nodePathParamKey];
-firestoreExport(accountCredentialsPath, nodePath)
-    .then(results => {
-        let stringResults;
-        if (prettyPrint) {
-            stringResults = JSON.stringify(results, null, 2);
-        } else {
-            stringResults = JSON.stringify(results);
-        }
-        return stringResults;
-    })
-    .then((dataToWrite: string) => writeResults(dataToWrite, backupPath))
+loadJsonFile(backupFile)
+    .then((data: any) => firestoreImport(accountCredentialsPath, data, nodePath))
     .then(() => {
         console.log(colors.bold(colors.green('All done 💫')));
     })
