@@ -5,6 +5,7 @@ import * as colors from 'colors';
 import * as process from 'process';
 import * as fs from 'fs';
 import firestoreImport from '../lib/import';
+import {getCredentialsFromFile, getDBReferenceFromPath, getFirestoreDBReference} from "../lib/firestore-helpers";
 import loadJsonFile = require("load-json-file");
 
 const packageInfo = require('../../package.json');
@@ -52,12 +53,23 @@ if (!fs.existsSync(backupFile)) {
 }
 
 const nodePath = commander[nodePathParamKey];
-loadJsonFile(backupFile)
-    .then((data: any) => firestoreImport(accountCredentialsPath, data, nodePath))
+
+const importPathPromise = getCredentialsFromFile(accountCredentialsPath)
+    .then(credentials => {
+        const db = getFirestoreDBReference(credentials);
+        const pathReference = getDBReferenceFromPath(db, nodePath);
+        return pathReference;
+    });
+
+Promise.all([loadJsonFile(backupFile), importPathPromise])
+    .then((res) => {
+        const [data, pathReference] = res;
+        return firestoreImport(data, pathReference);
+    })
     .then(() => {
         console.log(colors.bold(colors.green('All done 💫')));
     })
-    .catch((error) => {
+    .catch((error: string) => {
         console.log(colors.red(error));
         process.exit(1);
     });

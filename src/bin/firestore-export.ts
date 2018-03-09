@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 import * as commander from 'commander';
-
 import * as colors from 'colors';
 import * as process from 'process';
 import * as fs from 'fs';
 import firestoreExport from '../lib/export';
+import {getCredentialsFromFile, getDBReferenceFromPath, getFirestoreDBReference} from "../lib/firestore-helpers";
 
 const packageInfo = require('../../package.json');
 
@@ -14,11 +14,9 @@ const accountCredentialsPathParamDescription = 'Google Cloud account credentials
 const backupFileParamKey = 'backupFile';
 const backupFileParamDescription = 'Filename to store backup. (e.g. backups/full-backup.json)';
 
-const depthParamKey = 'depth';
-const depthParamDescription = 'Depth of backup';
-
 const nodePathParamKey = 'nodePath';
-const nodePathParamDescription = 'Path to database node to start (e.g. collectionA/docB/collectionC). Backs up entire database if missing';
+const nodePathParamDescription = 'Path to database node to start (e.g. collectionA/docB/collectionC). ' +
+    'Backs up entire database from the root if missing';
 
 const prettyPrintParamKey = 'prettyPrint';
 const prettyPrintParamDescription = 'JSON backups done with pretty-printing.';
@@ -26,7 +24,6 @@ const prettyPrintParamDescription = 'JSON backups done with pretty-printing.';
 commander.version(packageInfo.version)
     .option(`-a, --${accountCredentialsPathParamKey} <path>`, accountCredentialsPathParamDescription)
     .option(`-b, --${backupFileParamKey} <path>`, backupFileParamDescription)
-    .option(`-d, --${depthParamKey}`, depthParamDescription)
     .option(`-n, --${nodePathParamKey} <path>`, nodePathParamDescription)
     .option(`-p, --${prettyPrintParamKey}`, prettyPrintParamDescription)
     .parse(process.argv);
@@ -62,7 +59,13 @@ const writeResults = (results: string, filename: string) => {
 
 const prettyPrint = commander[prettyPrintParamKey] !== undefined && commander[prettyPrintParamKey] !== null;
 const nodePath = commander[nodePathParamKey];
-firestoreExport(accountCredentialsPath, nodePath)
+getCredentialsFromFile(accountCredentialsPath)
+    .then(credentials => {
+        const db = getFirestoreDBReference(credentials);
+        const pathReference = getDBReferenceFromPath(db, nodePath);
+        return pathReference;
+    })
+    .then(pathReference => firestoreExport(pathReference))
     .then(results => {
         let stringResults;
         if (prettyPrint) {

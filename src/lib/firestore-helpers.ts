@@ -1,0 +1,40 @@
+import * as admin from 'firebase-admin';
+import loadJsonFile = require("load-json-file");
+
+
+const getCredentialsFromFile = (credentialsFilename: string): Promise<admin.ServiceAccount> => {
+    return loadJsonFile(credentialsFilename);
+};
+
+const getFirestoreDBReference = (credentials: admin.ServiceAccount): admin.firestore.Firestore => {
+    admin.initializeApp({
+        credential: admin.credential.cert(credentials),
+        databaseURL: `https://${(credentials as any).project_id}.firebaseio.com`
+    });
+
+    return admin.firestore();
+};
+
+const getDBReferenceFromPath = (db: admin.firestore.Firestore, dataPath?: string): admin.firestore.Firestore |
+    FirebaseFirestore.DocumentReference |
+    FirebaseFirestore.CollectionReference => {
+    let startingRef;
+    if (dataPath) {
+        const parts = dataPath.split('/').length;
+        const isDoc = parts % 2 === 0;
+        startingRef = isDoc ? db.doc(dataPath) : db.collection(dataPath);
+    } else {
+        startingRef = db;
+    }
+    return startingRef;
+};
+
+const isDocument = (ref: admin.firestore.Firestore |
+    FirebaseFirestore.DocumentReference |
+    FirebaseFirestore.CollectionReference): ref is FirebaseFirestore.DocumentReference => {
+    return (<FirebaseFirestore.DocumentReference>ref).collection !== undefined;
+};
+
+const sleep = (timeInMS: number): Promise<void> => new Promise(resolve => setTimeout(resolve, timeInMS));
+
+export {getCredentialsFromFile, getFirestoreDBReference, getDBReferenceFromPath, isDocument, sleep};

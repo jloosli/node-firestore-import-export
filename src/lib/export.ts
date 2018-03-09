@@ -1,35 +1,16 @@
 import * as admin from 'firebase-admin';
-import loadJsonFile = require("load-json-file");
+import {isDocument, sleep} from "./firestore-helpers";
 
 const SLEEP_TIME = 1000;
 
-const isDocument = (ref: admin.firestore.Firestore |
+const exportData = async (startingRef: admin.firestore.Firestore |
     FirebaseFirestore.DocumentReference |
-    FirebaseFirestore.CollectionReference): ref is FirebaseFirestore.DocumentReference => {
-    return (<FirebaseFirestore.DocumentReference>ref).collection !== undefined;
-};
-
-let db: admin.firestore.Firestore;
-const initialize = (credentials: admin.ServiceAccount) => {
-    admin.initializeApp({
-        credential: admin.credential.cert(credentials),
-        databaseURL: `https://${credentials.project_id}.firebaseio.com`
-    });
-
-    db = admin.firestore();
-};
-
-const exportData = async (startingRef?: admin.firestore.Firestore |
-                              FirebaseFirestore.DocumentReference |
-                              FirebaseFirestore.CollectionReference |
-                              null = null,
-                          depth? = null) => {
-    startingRef = startingRef || db;
+    FirebaseFirestore.CollectionReference) => {
     if (isDocument(startingRef)) {
         const collectionsPromise = getCollections(startingRef);
-        const dataPromise = startingRef.get().then(snapshot=>snapshot.data());
-        return await Promise.all([collectionsPromise, dataPromise]).then(res=> {
-            return Object.assign({}, {'__collections__' : res[0]}, res[1]);
+        const dataPromise = startingRef.get().then(snapshot => snapshot.data());
+        return await Promise.all([collectionsPromise, dataPromise]).then(res => {
+            return Object.assign({}, {'__collections__': res[0]}, res[1]);
         });
     }
     else {
@@ -87,7 +68,7 @@ const getDocuments = async (collectionRef: FirebaseFirestore.CollectionReference
             docDetails[docSnapshot.id] = docSnapshot.data();
             const collections = await getCollections(docSnapshot.ref);
             // if (Object.keys(collections).length > 1 && collections.constructor === Object) {
-                docDetails[docSnapshot.id]['__collections__'] = collections;
+            docDetails[docSnapshot.id]['__collections__'] = collections;
             // }
             resolve(docDetails);
         }));
@@ -104,24 +85,4 @@ const getDocuments = async (collectionRef: FirebaseFirestore.CollectionReference
     return results;
 };
 
-const sleep = (timeInMS: number): Promise<void> => new Promise(resolve => setTimeout(resolve, timeInMS));
-
-const commandLine = (credentialsPath: string, dataPath?: string | null) => {
-    return loadJsonFile(credentialsPath)
-        .then((credentials: admin.ServiceAccount) => {
-            initialize(credentials);
-            let startingRef;
-            if (dataPath) {
-                const parts = dataPath.split('/').length;
-                const isDoc = parts % 2 === 0;
-                startingRef = isDoc ? db.doc(dataPath) : db.collection(dataPath);
-            } else {
-                startingRef = db;
-            }
-            return exportData(startingRef)
-        })
-        .catch(err => {
-            throw new Error("Credentials file not found");
-        });
-};
-export default commandLine;
+export default exportData;
