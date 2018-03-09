@@ -9,13 +9,13 @@ Firestore data backup and restoration
 Install using [__npm__](https://www.npmjs.com/).
 
 ```sh
-npm install -g firestore-import-export
+npm install -g node-firestore-import-export
 ```
 
  or [__yarn__](https://yarnpkg.com/en/)
 
 ```sh
-yarn global add firestore-import-export
+yarn global add node-firestore-import-export
 ```
 
 Alternatively download the source.
