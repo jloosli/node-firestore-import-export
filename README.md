@@ -32,7 +32,7 @@ git clone https://github.com/jloosli/node-firestore-import-export.git
 1. Navigate to __Service Accounts__
 1. Click _Generate New Private Key_
 
-This downloaded json file contains the proper credentials needed for __firestore-backup__ to authenticate.
+This downloaded json file contains the proper credentials needed for __node-firestore-import-export__ to authenticate.
 
 
 ## Usage
