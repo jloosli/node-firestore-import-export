@@ -53,7 +53,7 @@ const getDocuments = async (collectionRef: FirebaseFirestore.CollectionReference
             deadlineError = false;
         } catch (e) {
             if (e.message === 'Deadline Exceeded') {
-                console.log(`Deadline Error in getCollections()...waiting ${SLEEP_TIME / 1000} second(s) before retrying`);
+                console.log(`Deadline Error in getDocuments()...waiting ${SLEEP_TIME / 1000} second(s) before retrying`);
                 await sleep(SLEEP_TIME);
                 deadlineError = true;
             }
@@ -67,9 +67,7 @@ const getDocuments = async (collectionRef: FirebaseFirestore.CollectionReference
             console.log(docSnapshot.id, '=>', docSnapshot.data());
             docDetails[docSnapshot.id] = docSnapshot.data();
             const collections = await getCollections(docSnapshot.ref);
-            // if (Object.keys(collections).length > 1 && collections.constructor === Object) {
             docDetails[docSnapshot.id]['__collections__'] = collections;
-            // }
             resolve(docDetails);
         }));
     });
