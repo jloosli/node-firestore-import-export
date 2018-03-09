@@ -37,25 +37,44 @@ This downloaded json file contains the proper credentials needed for __firestore
 
 ## Usage
 
-### Backup:
-* `-a`, `--accountCredentials` `<path>` - Google Cloud account credentials JSON file.
-* `-B`, `--backupFile` `<path>`- Path to store the backup.
+### Export:
+* `-a`, `--accountCredentials` `<path>` - (required) Google Cloud account credentials JSON file.
+* `-b`, `--backupFile` `<path>`- Filename to store backup. (e.g. backups/full-backup.json).
+* `-n`, `--nodePath` `<path>`- Path to database node to start (e.g. collectionA/docB/collectionC).
+Backs up full database if empty or missing.
+* `-p`, `--prettyPrint` - JSON backups done with pretty-printing.
 
-Example:
+#### Examples
+##### Export full database
 ```sh
-firestore-import-export --accountCredentials path/to/credentials/file.json --backupFile /backups/myDatabase.json
+firestore-export --accountCredentials path/to/credentials/file.json --backupFile /backups/myDatabase.json
 ```
 
-### Backup with pretty printing:
-* `-P`, `--prettyPrint` - JSON backups done with pretty-printing.
-
-Example:
+##### Export with pretty printing:
 ```sh
-firestore-import-export --accountCredentials path/to/credentials/file.json --backupFile /backups/myDatabase.json --prettyPrint
+firestore-export --accountCredentials path/to/credentials/file.json --backupFile /backups/myDatabase.json --prettyPrint
 ```
 
-### Relax:
-That's it! ✨🌈
+##### Export only one document (and all its children/collections)
+```sh
+firestore-export --accountCredentials path/to/credentials/file.json --backupFile /backups/myDatabase.json --nodePath collectionA/document1/collectionCC
+```
+
+### Import:
+* `-a`, `--accountCredentials` `<path>` - (required) Google Cloud account credentials JSON file.
+* `-b`, `--backupFile` `<path>`- Filename with backup data. (e.g. backups/full-backup.json).
+* `-n`, `--nodePath` `<path>`- Path to database node to start (e.g. collectionA/docB/collectionC).
+
+#### Examples
+##### Import full database
+```sh
+firestore-import --accountCredentials path/to/credentials/file.json --backupFile /backups/myDatabase.json
+```
+
+##### Import to a specific path
+```sh
+firestore-export --accountCredentials path/to/credentials/file.json --backupFile /backups/myDatabase.json --nodePath collectionA/document1/collectionCC
+```
 
 ## Contributions
 Feel free to report bugs and make feature requests in the [Issue Tracker](https://github.com/jloosli/node-firestore-import-export/issues), fork and create pull requests!
