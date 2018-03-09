@@ -1,6 +1,6 @@
 {
   "name": "node-firestore-import-export",
-  "version": "0.5.4",
+  "version": "0.5.6",
   "description": "Firestore data import and export",
   "main": "./dist/index.js",
   "repository": "https://github.com/jloosli/node-firestore-import-export",

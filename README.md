@@ -1,9 +1,42 @@
 # node-firestore-import-export
-Firestore data backup and restoration
+Firestore data importing and exporting tool.
 
 [![codebeat badge](https://codebeat.co/badges/c7db349c-8de5-4b49-b366-55a0448eb18a)](https://codebeat.co/projects/github-com-jloosli-node-firestore-import-export-master)[![Codacy Badge](https://api.codacy.com/project/badge/Grade/2ea2abb4fa0f47d383a4a7221cfae4e8)](https://www.codacy.com/app/jloosli/node-firestore-import-export?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jloosli/node-firestore-import-export&amp;utm_campaign=Badge_Grade)
 [![David badge](https://david-dm.org/jloosli/node-firestore-import-export.svg)](https://david-dm.org/jloosli/node-firestore-import-export.svg)
 [![Known Vulnerabilities](https://snyk.io/test/github/jloosli/node-firestore-import-export/badge.svg)](https://snyk.io/test/github/jloosli/node-firestore-import-export)
+
+Export a Firestore database, including collections and documents, while keeping the structure 
+intact. Exports a json file with the following format:
+
+```json
+{
+  "__collections__": {
+    "companies": {
+      "docA": {
+        "name": "Big Co",
+        "employee_count": 2012,
+        "__collections__": {
+          "employees": ...,
+          "products": ...
+        }
+      },
+      "docB": ...,
+      "docC": ...
+    },
+    "administrators": {
+      "docA": ...,
+      "docB": ...
+    }
+  }
+}
+```
+
+where `__collections__` holds the collections for a given document (or the root of the database).
+
+Imports need to be from a file with the same structure (e.g. from an exported file). 
+
+__Be careful!__ This can easily overwrite or mess up your data if you import 
+to the wrong location.
 
 ## Installation
 Install using [__npm__](https://www.npmjs.com/).
@@ -55,7 +88,7 @@ firestore-export --accountCredentials path/to/credentials/file.json --backupFile
 firestore-export --accountCredentials path/to/credentials/file.json --backupFile /backups/myDatabase.json --prettyPrint
 ```
 
-##### Export only one document (and all its children/collections)
+##### Export from a specific path (and all its children/collections)
 ```sh
 firestore-export --accountCredentials path/to/credentials/file.json --backupFile /backups/myDatabase.json --nodePath collectionA/document1/collectionCC
 ```
