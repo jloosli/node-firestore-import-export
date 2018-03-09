@@ -80,4 +80,4 @@ firestore-export --accountCredentials path/to/credentials/file.json --backupFile
 Feel free to report bugs and make feature requests in the [Issue Tracker](https://github.com/jloosli/node-firestore-import-export/issues), fork and create pull requests!
 
 ### Inspiration
-The command line portion was inspired heavily by SteadyEquipment's [node-firestore-backup](https://github.com/steadyequipment/node-firestore-backup) 
+The command line was inspired heavily by SteadyEquipment's [node-firestore-backup](https://github.com/steadyequipment/node-firestore-backup) 
