@@ -1,5 +1,5 @@
 import * as admin from "firebase-admin";
-import {isDocument} from "./firestore-helpers";
+import {isLikeDocument} from "./firestore-helpers";
 import {ICollection} from "./interfaces";
 
 const importData = (data: any,
@@ -7,7 +7,7 @@ const importData = (data: any,
                         FirebaseFirestore.DocumentReference |
                         FirebaseFirestore.CollectionReference): Promise<any> => {
 
-    if (isDocument(startingRef) && data.hasOwnProperty('__collections__')) {
+    if (isLikeDocument(startingRef) && data.hasOwnProperty('__collections__')) {
         const collections = data['__collections__'];
         delete(data['__collections__']);
         const documentID = startingRef.id;
