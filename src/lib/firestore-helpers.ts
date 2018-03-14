@@ -29,12 +29,25 @@ const getDBReferenceFromPath = (db: admin.firestore.Firestore, dataPath?: string
     return startingRef;
 };
 
-const isDocument = (ref: admin.firestore.Firestore |
+const isLikeDocument = (ref: admin.firestore.Firestore |
     FirebaseFirestore.DocumentReference |
     FirebaseFirestore.CollectionReference): ref is FirebaseFirestore.DocumentReference => {
     return (<FirebaseFirestore.DocumentReference>ref).collection !== undefined;
 };
 
+const isRootOfDatabase = (ref: admin.firestore.Firestore |
+    FirebaseFirestore.DocumentReference |
+    FirebaseFirestore.CollectionReference): ref is admin.firestore.Firestore => {
+    return (<admin.firestore.Firestore>ref).batch !== undefined;
+};
+
 const sleep = (timeInMS: number): Promise<void> => new Promise(resolve => setTimeout(resolve, timeInMS));
 
-export {getCredentialsFromFile, getFirestoreDBReference, getDBReferenceFromPath, isDocument, sleep};
+export {
+    getCredentialsFromFile,
+    getFirestoreDBReference,
+    getDBReferenceFromPath,
+    isLikeDocument,
+    isRootOfDatabase,
+    sleep
+};

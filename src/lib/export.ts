@@ -1,14 +1,19 @@
 import * as admin from 'firebase-admin';
-import {isDocument, sleep} from "./firestore-helpers";
+import {isLikeDocument, isRootOfDatabase, sleep} from "./firestore-helpers";
 
 const SLEEP_TIME = 1000;
 
 const exportData = async (startingRef: admin.firestore.Firestore |
     FirebaseFirestore.DocumentReference |
     FirebaseFirestore.CollectionReference) => {
-    if (isDocument(startingRef)) {
+    if (isLikeDocument(startingRef)) {
         const collectionsPromise = getCollections(startingRef);
-        const dataPromise = startingRef.get().then(snapshot => snapshot.data());
+        let dataPromise:Promise<any>;
+        if (isRootOfDatabase(startingRef)) {
+            dataPromise = Promise.resolve({});
+        } else {
+            dataPromise = (<FirebaseFirestore.DocumentReference>startingRef).get().then(snapshot => snapshot.data());
+        }
         return await Promise.all([collectionsPromise, dataPromise]).then(res => {
             return Object.assign({}, {'__collections__': res[0]}, res[1]);
         });
