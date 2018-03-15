@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import * as commander from 'commander';
-
+import * as prompt from 'prompt';
 import * as colors from 'colors';
 import * as process from 'process';
 import * as fs from 'fs';
@@ -57,11 +57,35 @@ const nodePath = commander[nodePathParamKey];
 const importPathPromise = getCredentialsFromFile(accountCredentialsPath)
     .then(credentials => {
         const db = getFirestoreDBReference(credentials);
-        const pathReference = getDBReferenceFromPath(db, nodePath);
-        return pathReference;
+        return getDBReferenceFromPath(db, nodePath);
     });
 
 Promise.all([loadJsonFile(backupFile), importPathPromise])
+    .then((res) => {
+        const [data, pathReference] = res;
+        return new Promise((resolve, reject) => {
+            prompt.start();
+            const nodeLocation = pathReference.path || '(database root)';
+            prompt.get({
+                properties: {
+                    response: {
+                        description: `Import ${backupFile} to ${nodeLocation} [y/N]? `
+                    }
+                }
+            }, (err, result) => {
+                if (err) {
+                    return reject(err);
+                }
+                switch (result.response.trim().toLowerCase()) {
+                    case 'y':
+                        resolve(res);
+                        break;
+                    default:
+                        reject('Import aborted.');
+                }
+            })
+        })
+    })
     .then((res) => {
         const [data, pathReference] = res;
         return firestoreImport(data, pathReference);
@@ -70,9 +94,13 @@ Promise.all([loadJsonFile(backupFile), importPathPromise])
         console.log(colors.bold(colors.green('All done 🎉')));
     })
     .catch((error) => {
-        console.log(colors.red(`${error.name}: ${error.message}`));
-        console.log(colors.red(error.stack));
-        process.exit(1);
+        if (error.message) {
+            console.log(colors.red(`${error.name}: ${error.message}`));
+            console.log(colors.red(error.stack));
+            process.exit(1);
+        } else {
+            console.log(colors.red(error));
+        }
     });
 
 

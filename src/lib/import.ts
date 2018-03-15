@@ -1,6 +1,7 @@
 import * as admin from "firebase-admin";
 import {isLikeDocument, isRootOfDatabase} from "./firestore-helpers";
 import {ICollection} from "./interfaces";
+import {array_chunks} from "./helpers";
 
 const importData = (data: any,
                     startingRef: admin.firestore.Firestore |
@@ -16,7 +17,7 @@ const importData = (data: any,
                 collectionPromises.push(setDocuments(collections[collection], startingRef.collection(collection)));
             }
         }
-        if(isRootOfDatabase(startingRef)) {
+        if (isRootOfDatabase(startingRef)) {
             return Promise.all(collectionPromises);
         } else {
             const documentID = startingRef.id;
@@ -31,37 +32,41 @@ const importData = (data: any,
     }
 };
 
-const setDocuments = async (data: ICollection, startingRef: FirebaseFirestore.CollectionReference) => {
-    const collections: Array<any> = [];
-    const batch = startingRef.firestore.batch();
-    for (let documentKey in data) {
-        if (data.hasOwnProperty(documentKey) && documentKey !== '__collections__') {
-            const documentData: any = {};
-            for (let field in data[documentKey]) {
-                if (data[documentKey].hasOwnProperty(field)) {
-                    if (field !== '__collections__') {
-                        documentData[field] = data[documentKey][field];
-                    } else {
-                        for (let collection in data[documentKey][field]) {
-                            if (data[documentKey][field].hasOwnProperty(collection)) {
-                                collections.push({
-                                    path: startingRef.doc(documentKey).collection(collection),
-                                    collection: data[documentKey][field][collection]
-                                });
-                            }
-                        }
-                    }
-                }
-            }
-            batch.set(startingRef.doc(documentKey), documentData, {merge: true});
-        }
+const setDocuments = (data: ICollection, startingRef: FirebaseFirestore.CollectionReference) => {
+    console.log(`Writing documents for ${startingRef.path}`);
+    if ('__collections__' in data) {
+        throw new Error('Found unexpected "__collection__" in collection data. Does the starting node match' +
+            ' the root of the incoming data?');
     }
-    return batch.commit()
+    const collections: Array<any> = [];
+    const chunks = array_chunks(Object.keys(data), 500);
+    const chunkPromises = chunks.map((documentKeys: string[]) => {
+        const batch = startingRef.firestore.batch();
+        documentKeys.map((documentKey: string) => {
+            if (data[documentKey]['__collections__']) {
+                Object.keys(data[documentKey]['__collections__']).map(collection => {
+                    collections.push({
+                        path: startingRef.doc(documentKey).collection(collection),
+                        collection: data[documentKey]['__collections__'][collection]
+                    });
+                });
+                delete(data[documentKey]['__collections__']);
+            }
+            const documentData: any = {};
+            Object.keys(data[documentKey]).map(field => {
+                documentData[field] = data[documentKey][field];
+            });
+            batch.set(startingRef.doc(documentKey), documentData, {merge: true});
+        });
+        return batch.commit();
+    });
+    return Promise.all(chunkPromises)
         .then(() => {
-            collections.map((col) => {
+            return collections.map((col) => {
                 return setDocuments(col.collection, col.path);
             })
-        });
+        })
+        .then(subCollectionPromises => Promise.all(subCollectionPromises));
 };
 
 export default importData;

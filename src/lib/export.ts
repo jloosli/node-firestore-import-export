@@ -43,7 +43,7 @@ const getCollections = async (startingRef: admin.firestore.Firestore | FirebaseF
     });
     const results = await Promise.all(collectionPromises.map(async (el) => [el[0], await el[1]]));
     const zipped: any = {};
-    console.log(results);
+    // console.log(results);
     results.map((res: any) => {
         zipped[res[0]] = res[1]
     });
@@ -51,6 +51,7 @@ const getCollections = async (startingRef: admin.firestore.Firestore | FirebaseF
 };
 
 const getDocuments = async (collectionRef: FirebaseFirestore.CollectionReference) => {
+    console.log(`Retrieving documents from ${collectionRef.path}`);
     let allDocuments, deadlineError = false;
     do {
         try {
@@ -69,7 +70,7 @@ const getDocuments = async (collectionRef: FirebaseFirestore.CollectionReference
     allDocuments.forEach((docSnapshot) => {
         documentPromises.push(new Promise(async (resolve) => {
             const docDetails: any = {};
-            console.log(docSnapshot.id, '=>', docSnapshot.data());
+            // console.log(docSnapshot.id, '=>', docSnapshot.data());
             docDetails[docSnapshot.id] = docSnapshot.data();
             const collections = await getCollections(docSnapshot.ref);
             docDetails[docSnapshot.id]['__collections__'] = collections;
@@ -78,7 +79,7 @@ const getDocuments = async (collectionRef: FirebaseFirestore.CollectionReference
     });
     (await Promise.all(documentPromises))
         .map((res: any) => {
-            console.log(res);
+            // console.log(res);
             for (let key in res) {
                 if (res.hasOwnProperty(key)) {
                     (<any>results)[key] = res[key];

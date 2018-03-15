@@ -49,12 +49,15 @@ if (!backupPath) {
 }
 
 const writeResults = (results: string, filename: string) => {
-    fs.writeFile(filename, results, 'utf8', err => {
-        if (err) {
-            return console.log(err);
-        }
-        console.log(`Results were saved to ${filename}`);
-    })
+    return new Promise((resolve, reject) => {
+        fs.writeFile(filename, results, 'utf8', err => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(filename);
+            }
+        });
+    });
 };
 
 const prettyPrint = commander[prettyPrintParamKey] !== undefined && commander[prettyPrintParamKey] !== null;
@@ -76,6 +79,7 @@ getCredentialsFromFile(accountCredentialsPath)
         return stringResults;
     })
     .then((dataToWrite: string) => writeResults(dataToWrite, backupPath))
+    .then((filename: string) => console.log(colors.yellow(`Results were saved to ${filename}`)))
     .then(() => {
         console.log(colors.bold(colors.green('All done 💫')));
     })
