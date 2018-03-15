@@ -1,5 +1,5 @@
 import * as admin from "firebase-admin";
-import {isDocument} from "./firestore-helpers";
+import {isLikeDocument, isRootOfDatabase} from "./firestore-helpers";
 import {ICollection} from "./interfaces";
 
 const importData = (data: any,
@@ -7,20 +7,24 @@ const importData = (data: any,
                         FirebaseFirestore.DocumentReference |
                         FirebaseFirestore.CollectionReference): Promise<any> => {
 
-    if (isDocument(startingRef) && data.hasOwnProperty('__collections__')) {
+    if (isLikeDocument(startingRef) && data.hasOwnProperty('__collections__')) {
         const collections = data['__collections__'];
         delete(data['__collections__']);
-        const documentID = startingRef.id;
-        const documentData: any = {};
-        documentData[documentID] = data;
-        const documentPromise = setDocuments(documentData, startingRef.parent);
         const collectionPromises: Array<Promise<any>> = [];
         for (const collection in collections) {
             if (collections.hasOwnProperty(collection)) {
                 collectionPromises.push(setDocuments(collections[collection], startingRef.collection(collection)));
             }
         }
-        return documentPromise.then(() => Promise.all(collectionPromises));
+        if(isRootOfDatabase(startingRef)) {
+            return Promise.all(collectionPromises);
+        } else {
+            const documentID = startingRef.id;
+            const documentData: any = {};
+            documentData[documentID] = data;
+            const documentPromise = setDocuments(documentData, startingRef.parent);
+            return documentPromise.then(() => Promise.all(collectionPromises));
+        }
     }
     else {
         return setDocuments(data, <FirebaseFirestore.CollectionReference>startingRef);
