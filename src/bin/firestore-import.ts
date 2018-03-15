@@ -67,10 +67,11 @@ Promise.all([loadJsonFile(backupFile), importPathPromise])
         return firestoreImport(data, pathReference);
     })
     .then(() => {
-        console.log(colors.bold(colors.green('All done 💫')));
+        console.log(colors.bold(colors.green('All done 🎉')));
     })
-    .catch((error: string) => {
-        console.log(colors.red(error));
+    .catch((error) => {
+        console.log(colors.red(`${error.name}: ${error.message}`));
+        console.log(colors.red(error.stack));
         process.exit(1);
     });
 
