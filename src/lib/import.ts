@@ -32,7 +32,7 @@ const importData = (data: any,
     }
 };
 
-const setDocuments = (data: ICollection, startingRef: FirebaseFirestore.CollectionReference) => {
+const setDocuments = (data: ICollection, startingRef: FirebaseFirestore.CollectionReference): Promise<any> => {
     console.log(`Writing documents for ${startingRef.path}`);
     if ('__collections__' in data) {
         throw new Error('Found unexpected "__collection__" in collection data. Does the starting node match' +

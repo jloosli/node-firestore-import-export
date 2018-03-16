@@ -48,7 +48,7 @@ if (!backupPath) {
     process.exit(1);
 }
 
-const writeResults = (results: string, filename: string) => {
+const writeResults = (results: string, filename: string): Promise<string> => {
     return new Promise((resolve, reject) => {
         fs.writeFile(filename, results, 'utf8', err => {
             if (err) {
@@ -79,13 +79,20 @@ getCredentialsFromFile(accountCredentialsPath)
         return stringResults;
     })
     .then((dataToWrite: string) => writeResults(dataToWrite, backupPath))
-    .then((filename: string) => console.log(colors.yellow(`Results were saved to ${filename}`)))
+    .then((filename: string) => {
+        console.log(colors.yellow(`Results were saved to ${filename}`));
+        return;
+    })
     .then(() => {
-        console.log(colors.bold(colors.green('All done 💫')));
+        console.log(colors.bold(colors.green('All done 🎉')));
     })
     .catch((error) => {
-        console.log(colors.red(error));
-        process.exit(1);
+        if (error instanceof Error) {
+            console.log(colors.red(error.message));
+            process.exit(1);
+        } else {
+            console.log(colors.red(error))
+        }
     });
 
 

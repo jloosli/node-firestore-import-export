@@ -63,16 +63,26 @@ const importPathPromise = getCredentialsFromFile(accountCredentialsPath)
 Promise.all([loadJsonFile(backupFile), importPathPromise])
     .then((res) => {
         const [data, pathReference] = res;
+        const nodeLocation = (<FirebaseFirestore.DocumentReference | FirebaseFirestore.CollectionReference>pathReference)
+            .path || '[database root]';
+        // For some reason, Firestore, DocumentReference, and CollectionReference interfaces
+        // don't show a projectId property even though they do have them.
+        // @todo: Remove any when that is fixed, or find the correct interface
+        const projectID = (<any>pathReference).projectId ||
+            (<any>pathReference).firestore.projectId;
+        const importText = `About to import data ${backupFile} to the '${projectID}' firestore at '${nodeLocation}'.`;
+        console.log(`\n\n${colors.bold(colors.blue(importText))}`);
+        console.log(colors.bgYellow(colors.blue(' === Warning: This will overwrite existing data. Do you want to proceed? === ')));
         return new Promise((resolve, reject) => {
+            prompt.message = 'firestore-import';
             prompt.start();
-            const nodeLocation = pathReference.path || '(database root)';
             prompt.get({
                 properties: {
                     response: {
-                        description: `Import ${backupFile} to ${nodeLocation} [y/N]? `
+                        description: colors.red(`Proceed with import? [y/N] `)
                     }
                 }
-            }, (err, result) => {
+            }, (err: Error, result: any) => {
                 if (err) {
                     return reject(err);
                 }
@@ -86,7 +96,7 @@ Promise.all([loadJsonFile(backupFile), importPathPromise])
             })
         })
     })
-    .then((res) => {
+    .then((res: any) => {
         const [data, pathReference] = res;
         return firestoreImport(data, pathReference);
     })
@@ -94,9 +104,9 @@ Promise.all([loadJsonFile(backupFile), importPathPromise])
         console.log(colors.bold(colors.green('All done 🎉')));
     })
     .catch((error) => {
-        if (error.message) {
+        if (error instanceof Error) {
             console.log(colors.red(`${error.name}: ${error.message}`));
-            console.log(colors.red(error.stack));
+            console.log(colors.red(error.stack as string));
             process.exit(1);
         } else {
             console.log(colors.red(error));
