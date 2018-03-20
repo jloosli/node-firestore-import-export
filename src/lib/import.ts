@@ -8,12 +8,13 @@ const importData = (data: any,
                       FirebaseFirestore.DocumentReference |
                       FirebaseFirestore.CollectionReference): Promise<any> => {
 
+  const dataToImport = Object.assign({}, data);
   if (isLikeDocument(startingRef)) {
-    if (!data.hasOwnProperty('__collections__')) {
+    if (!dataToImport.hasOwnProperty('__collections__')) {
       throw new Error('Root or document reference doesn\'t contain a __collections__ property.');
     }
-    const collections = data['__collections__'];
-    delete(data['__collections__']);
+    const collections = dataToImport['__collections__'];
+    delete(dataToImport['__collections__']);
     const collectionPromises: Array<Promise<any>> = [];
     for (const collection in collections) {
       if (collections.hasOwnProperty(collection)) {
@@ -25,13 +26,13 @@ const importData = (data: any,
     } else {
       const documentID = startingRef.id;
       const documentData: any = {};
-      documentData[documentID] = data;
+      documentData[documentID] = dataToImport;
       const documentPromise = setDocuments(documentData, startingRef.parent);
       return documentPromise.then(() => Promise.all(collectionPromises));
     }
   }
   else {
-    return setDocuments(data, <FirebaseFirestore.CollectionReference>startingRef);
+    return setDocuments(dataToImport, <FirebaseFirestore.CollectionReference>startingRef);
   }
 };
 

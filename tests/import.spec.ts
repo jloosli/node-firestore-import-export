@@ -71,7 +71,7 @@ describe('Firestore Import', () => {
       const documentLocation = mockFirestore.collection('collectionA');
       const results = firestoreImport(sampleRootData, documentLocation);
       await Promise.all([results]);
-      expect.fail(null, 'This should not be run.');
+      expect.fail(null, 'This will be passed to the catch statement.');
     } catch (err) {
       if (err instanceof AssertionError) {
         expect.fail(null, 'This should not be run.');
