@@ -1,6 +1,6 @@
 {
   "name": "node-firestore-import-export",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Firestore data import and export",
   "main": "./dist/index.js",
   "repository": "https://github.com/jloosli/node-firestore-import-export",
@@ -21,7 +21,8 @@
     "import": "./dist/bin/firestore-import.js",
     "build": "npm run clean && tsc",
     "watch": "tsc -w",
-    "clean": "rm -rf dist && mkdir dist"
+    "clean": "rm -rf dist && mkdir dist",
+    "tests": "mocha -r ts-node/register tests/**/*.spec.ts"
   },
   "bin": {
     "firestore-export": "./dist/bin/firestore-export.js",
@@ -39,10 +40,15 @@
     "prompt": "^1.0.0"
   },
   "devDependencies": {
+    "@types/chai": "^4.1.2",
     "@types/commander": "^2.12.2",
     "@types/core-js": "^0.9.46",
     "@types/load-json-file": "^2.0.7",
+    "@types/mocha": "^2.2.48",
     "@types/node": "^9.4.6",
+    "chai": "^4.1.2",
+    "firebase-mock": "^2.1.8",
+    "mocha": "^5.0.4",
     "ts-node": "^5.0.1",
     "typescript": "^2.7.2"
   }
