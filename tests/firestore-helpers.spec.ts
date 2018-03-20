@@ -1,12 +1,14 @@
 import 'mocha';
 import {expect} from 'chai';
 import {
-    getCredentialsFromFile,
-    getDBReferenceFromPath,
-    isLikeDocument,
-    isRootOfDatabase,
-    sleep
+  getCredentialsFromFile,
+  getDBReferenceFromPath,
+  isLikeDocument,
+  isRootOfDatabase,
+  sleep
 } from "../src/lib/firestore-helpers";
+import DocumentReference = FirebaseFirestore.DocumentReference;
+import CollectionReference = FirebaseFirestore.CollectionReference;
 
 const firebasemock = require('firebase-mock');
 
@@ -62,7 +64,7 @@ describe('Firestore Helpers', () => {
             const dummyFilename = 'i_do_not_exist.json';
             try {
                 await getCredentialsFromFile(dummyFilename);
-                expect().fail(null, 'This should not be run');
+              expect.fail(null, 'This should not be run');
             } catch (e) {
                 expect(e).to.exist;
             }
@@ -75,14 +77,14 @@ describe('Firestore Helpers', () => {
             const mockFirestore = new firebasemock.MockFirestore();
             const documentPath = 'collection/doc';
             const dbReference = getDBReferenceFromPath(mockFirestore, documentPath);
-            expect(dbReference.path).to.equal(documentPath);
+          expect((dbReference as DocumentReference).path).to.equal(documentPath);
         });
 
         it('should create a collection reference with the requested path', () => {
             const mockFirestore = new firebasemock.MockFirestore();
-            const documentPath = 'collection/doc/subCollection';
-            const dbReference = getDBReferenceFromPath(mockFirestore, documentPath);
-            expect(dbReference.path).to.equal(documentPath);
+          const collectionPath = 'collection/doc/subCollection';
+          const dbReference = getDBReferenceFromPath(mockFirestore, collectionPath);
+          expect((dbReference as CollectionReference).path).to.equal(collectionPath);
         });
     });
 

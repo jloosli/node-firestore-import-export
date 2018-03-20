@@ -2,8 +2,9 @@ import 'mocha';
 import firebaseExport from '../src/lib/export';
 import {expect} from 'chai';
 
-const firebasemock = require('firebase-mock');
-const DocumentReference = require('firebase-mock/src/firestore-document');
+const firebasemock: any = require('firebase-mock');
+// import * as firebasemock from 'firebase-mock';
+const DocumentReference: any = require('firebase-mock/src/firestore-document');
 
 const sampleRootData = {
   __collections__: {
@@ -37,7 +38,7 @@ const sampleRootData = {
   }
 };
 
-const getCollections = function (): Promise<FirebaseFirestore.CollectionReference[]> {
+const getCollections = function (this: any): Promise<FirebaseFirestore.CollectionReference[]> {
   const self = this;
   return new Promise((resolve, reject) => {
     let collections: Array<any>;
@@ -54,7 +55,7 @@ const getCollections = function (): Promise<FirebaseFirestore.CollectionReferenc
 
 
 describe('Firestore Export', () => {
-  let mockFirestore;
+  let mockFirestore: any;
 
   before(() => {
     // Adding since this is missing as of 03/15/2018 in firebase-mock

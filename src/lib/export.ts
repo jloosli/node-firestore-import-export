@@ -40,8 +40,8 @@ const getCollections = async (startingRef: admin.firestore.Firestore | FirebaseF
     }
   } while (deadlineError || !collectionsSnapshot);
 
-  const collectionNames = [];
-  const collectionPromises = [];
+  const collectionNames: Array<string> = [];
+  const collectionPromises: Array<Promise<any>> = [];
   collectionsSnapshot.map((collectionRef: FirebaseFirestore.CollectionReference) => {
     collectionNames.push(collectionRef.id);
     collectionPromises.push(getDocuments(collectionRef));

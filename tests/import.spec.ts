@@ -37,7 +37,7 @@ const documentDataMissingCollections = {
 };
 
 describe('Firestore Import', () => {
-  let mockFirestore;
+  let mockFirestore: any;
 
   beforeEach(() => {
     mockFirestore = new firebasemock.MockFirestore();
