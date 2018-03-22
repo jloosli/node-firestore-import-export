@@ -6,7 +6,7 @@ import {
   isLikeDocument,
   isRootOfDatabase,
   sleep
-} from "../src/lib/firestore-helpers";
+} from "../lib/firestore-helpers";
 import DocumentReference = FirebaseFirestore.DocumentReference;
 import CollectionReference = FirebaseFirestore.CollectionReference;
 

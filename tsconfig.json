@@ -6,10 +6,7 @@
     "strict": true,
     "declaration": true,
     "outDir": "./dist/",
-    "rootDirs": [
-      "./src/bin",
-      "./src/lib"
-    ],
+    "rootDir": ".",
     "lib": [
       "es6",
       "es2015",
@@ -21,10 +18,6 @@
       "./@types"
     ]
   },
-//  "include": [
-//    "src/bin/firestore-export.ts",
-//    "src/lib/export.ts"
-//  ],
   "exclude": [
     "node_modules",
     "dist"
