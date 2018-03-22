@@ -21,13 +21,10 @@
       "./@types"
     ]
   },
-//  "include": [
-//    "src/bin/firestore-export.ts",
-//    "src/lib/export.ts"
-//  ],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "tests"
   ],
   "compileOnSave": true
 }
