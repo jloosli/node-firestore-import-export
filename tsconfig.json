@@ -6,10 +6,7 @@
     "strict": true,
     "declaration": true,
     "outDir": "./dist/",
-    "rootDirs": [
-      "./src/bin",
-      "./src/lib"
-    ],
+    "rootDir": ".",
     "lib": [
       "es6",
       "es2015",

@@ -1,6 +1,6 @@
 import {AssertionError, expect} from 'chai';
 import 'mocha';
-import firestoreImport from '../src/lib/import';
+import firestoreImport from '../lib/import';
 
 
 const firebasemock = require('firebase-mock');

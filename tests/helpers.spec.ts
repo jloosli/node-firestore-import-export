@@ -1,4 +1,4 @@
-import {array_chunks} from '../src/lib/helpers';
+import {array_chunks} from '../lib/helpers';
 import {expect} from 'chai';
 import 'mocha';
 

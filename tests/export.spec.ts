@@ -1,5 +1,5 @@
 import 'mocha';
-import firebaseExport from '../src/lib/export';
+import firebaseExport from '../lib/export';
 import {expect} from 'chai';
 
 const firebasemock: any = require('firebase-mock');
