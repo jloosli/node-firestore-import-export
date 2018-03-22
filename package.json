@@ -17,8 +17,8 @@
     "url": "https://github.com/jloosli/node-firestore-import-export/issues"
   },
   "scripts": {
-    "export": "./dist/bin/firestore-export.js",
-    "import": "./dist/bin/firestore-import.js",
+    "export": "node ./dist/bin/firestore-export.js",
+    "import": "node ./dist/bin/firestore-import.js",
     "build": "npm run clean && tsc",
     "watch": "tsc -w",
     "clean": "rm -rf dist && mkdir dist",
