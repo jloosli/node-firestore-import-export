@@ -5,6 +5,7 @@ Firestore data importing and exporting tool.
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/578282c87d824a1e9aa650cdcadcdd31)](https://www.codacy.com/app/jloosli/node-firestore-import-export?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jloosli/node-firestore-import-export&amp;utm_campaign=Badge_Grade)
 [![David badge](https://david-dm.org/jloosli/node-firestore-import-export.svg)](https://david-dm.org/jloosli/node-firestore-import-export.svg)
 [![Known Vulnerabilities](https://snyk.io/test/github/jloosli/node-firestore-import-export/badge.svg)](https://snyk.io/test/github/jloosli/node-firestore-import-export)
+[![CircleCI](https://circleci.com/gh/jloosli/node-firestore-import-export.svg?style=svg)](https://circleci.com/gh/jloosli/node-firestore-import-export)
 
 Export a Firestore database, including collections and documents, while keeping the structure 
 intact. Exports a json file with the following format:
