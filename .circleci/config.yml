@@ -2,36 +2,114 @@
 #
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
 #
+
+defaults: &defaults
+  working_directory: ~/repo
+
+
 version: 2
 jobs:
-  build:
+  build-node6:
+    <<: *defaults
     docker:
       # specify the version you desire here
-      - image: circleci/node:7.10
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/mongo:3.4.4
-
-    working_directory: ~/repo
-
+      - image: circleci/node:6-stretch
     steps:
       - checkout
-
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "package.json" }}
+          - v6-dependencies-{{ checksum "package.json" }}
           # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+          - v6-dependencies-
 
       - run: yarn install
 
       - save_cache:
           paths:
             - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
+          key: v6-dependencies-{{ checksum "package.json" }}
 
       # run tests!
       - run: yarn tests
+
+  build-node8:
+    <<: *defaults
+    docker:
+      # specify the version you desire here
+      - image: circleci/node:8-stretch
+    steps:
+      - checkout
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+          - v8-dependencies-{{ checksum "package.json" }}
+          # fallback to using the latest cache if no exact match is found
+          - v8-dependencies-
+
+      - run: yarn install
+
+      - save_cache:
+          paths:
+            - node_modules
+          key: v8-dependencies-{{ checksum "package.json" }}
+
+      # run tests!
+      - run: yarn tests
+
+  build-node9:
+    <<: *defaults
+    docker:
+      # specify the version you desire here
+      - image: circleci/node:9-stretch
+    steps:
+      - checkout
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+          - v9-dependencies-{{ checksum "package.json" }}
+          # fallback to using the latest cache if no exact match is found
+          - v9-dependencies-
+
+      - run: yarn install
+
+      - save_cache:
+          paths:
+            - node_modules
+          key: v6-dependencies-{{ checksum "package.json" }}
+
+      # run tests!
+      - run: yarn tests
+
+  build-node10:
+    <<: *defaults
+    docker:
+      # specify the version you desire here
+      - image: circleci/node:latest-browsers
+    steps:
+      - checkout
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+          - v-10-dependencies-{{ checksum "package.json" }}
+          # fallback to using the latest cache if no exact match is found
+          - v-10-dependencies-
+
+      - run: yarn install
+
+      - save_cache:
+          paths:
+            - node_modules
+          key: v-10-dependencies-{{ checksum "package.json" }}
+
+      # run tests!
+      - run: yarn tests
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build-node6
+      - build-node8
+      - build-node9
+      - build-node10
