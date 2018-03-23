@@ -28,6 +28,9 @@
     "firestore-export": "./dist/bin/firestore-export.js",
     "firestore-import": "./dist/bin/firestore-import.js"
   },
+  "engines": {
+    "npm": ">=6.0"
+  },
   "preferGlobal": true,
   "dependencies": {
     "@google-cloud/firestore": "^0.13.0",
