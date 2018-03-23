@@ -13,7 +13,7 @@ jobs:
     <<: *defaults
     docker:
       # specify the version you desire here
-      - image: circleci/node:6
+      - image: circleci/node:6-stretch
     steps:
       - checkout
       # Download and cache dependencies
@@ -37,22 +37,22 @@ jobs:
     <<: *defaults
     docker:
       # specify the version you desire here
-      - image: circleci/node:8
+      - image: circleci/node:8-stretch
     steps:
       - checkout
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - v6-dependencies-{{ checksum "package.json" }}
+          - v8-dependencies-{{ checksum "package.json" }}
           # fallback to using the latest cache if no exact match is found
-          - v6-dependencies-
+          - v8-dependencies-
 
       - run: yarn install
 
       - save_cache:
           paths:
             - node_modules
-          key: v6-dependencies-{{ checksum "package.json" }}
+          key: v8-dependencies-{{ checksum "package.json" }}
 
       # run tests!
       - run: yarn tests
@@ -61,15 +61,15 @@ jobs:
     <<: *defaults
     docker:
       # specify the version you desire here
-      - image: circleci/node:9
+      - image: circleci/node:9-stretch
     steps:
       - checkout
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - v6-dependencies-{{ checksum "package.json" }}
+          - v9-dependencies-{{ checksum "package.json" }}
           # fallback to using the latest cache if no exact match is found
-          - v6-dependencies-
+          - v9-dependencies-
 
       - run: yarn install
 
@@ -85,22 +85,22 @@ jobs:
     <<: *defaults
     docker:
       # specify the version you desire here
-      - image: circleci/node:10
+      - image: circleci/node:latest-browsers
     steps:
       - checkout
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - v6-dependencies-{{ checksum "package.json" }}
+          - v-10-dependencies-{{ checksum "package.json" }}
           # fallback to using the latest cache if no exact match is found
-          - v6-dependencies-
+          - v-10-dependencies-
 
       - run: yarn install
 
       - save_cache:
           paths:
             - node_modules
-          key: v6-dependencies-{{ checksum "package.json" }}
+          key: v-10-dependencies-{{ checksum "package.json" }}
 
       # run tests!
       - run: yarn tests
