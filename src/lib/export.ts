@@ -3,6 +3,8 @@ import {isLikeDocument, isRootOfDatabase, sleep} from "./firestore-helpers";
 
 const SLEEP_TIME = 1000;
 
+//@todo: Add support for data types
+
 const exportData = async (startingRef: admin.firestore.Firestore |
   FirebaseFirestore.DocumentReference |
   FirebaseFirestore.CollectionReference) => {
