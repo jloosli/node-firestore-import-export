@@ -2,33 +2,8 @@ import {AssertionError, expect} from 'chai';
 import 'mocha';
 import firestoreImport from '../src/lib/import';
 
-
 const firebasemock = require('firebase-mock');
 const sampleRootData = require('./sampleRootData.json');
-// const sampleRootData = {
-//   __collections__: {
-//     collectionA: {
-//       docA: {
-//         name: 'john',
-//         __collections__: {}
-//       },
-//       docB: {
-//         name: 'john',
-//         __collections__: {}
-//       }
-//     },
-//     collectionB: {
-//       docC: {
-//         name: 'annie',
-//         __collections__: {}
-//       },
-//       docD: {
-//         name: 'annie',
-//         __collections__: {}
-//       }
-//     }
-//   }
-// };
 
 const documentDataMissingCollections = {
   name: 'ashley',
