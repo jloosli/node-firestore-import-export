@@ -1,9 +1,8 @@
-import * as admin from 'firebase-admin';
 import {isLikeDocument, isRootOfDatabase, sleep} from "./firestore-helpers";
+import * as admin from "firebase-admin";
+import {serializeSpecialTypes} from "./helpers";
 
 const SLEEP_TIME = 1000;
-
-//@todo: Add support for data types
 
 const exportData = async (startingRef: admin.firestore.Firestore |
   FirebaseFirestore.DocumentReference |
@@ -17,7 +16,8 @@ const exportData = async (startingRef: admin.firestore.Firestore |
       dataPromise = (<FirebaseFirestore.DocumentReference>startingRef).get().then(snapshot => snapshot.data());
     }
     return await Promise.all([collectionsPromise, dataPromise]).then(res => {
-      return Object.assign({}, {'__collections__': res[0]}, res[1]);
+      // return Object.assign({}, {'__collections__': res[0]}, res[1]);
+      return {'__collections__': res[0], ...res[1]};
     });
   }
   else {
@@ -79,7 +79,7 @@ const getDocuments = async (collectionRef: FirebaseFirestore.CollectionReference
     documentPromises.push(new Promise(async (resolve) => {
       const docDetails: any = {};
       // console.log(docSnapshot.id, '=>', docSnapshot.data());
-      docDetails[docSnapshot.id] = docSnapshot.data();
+      docDetails[docSnapshot.id] = serializeSpecialTypes(docSnapshot.data());
       const collections = await getCollections(docSnapshot.ref);
       docDetails[docSnapshot.id]['__collections__'] = collections;
       resolve(docDetails);
@@ -91,5 +91,6 @@ const getDocuments = async (collectionRef: FirebaseFirestore.CollectionReference
     });
   return results;
 };
+
 
 export default exportData;
