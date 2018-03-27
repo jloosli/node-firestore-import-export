@@ -121,6 +121,7 @@ firestore-export --accountCredentials path/to/credentials/file.json --backupFile
 * `-a`, `--accountCredentials` `<path>` - (required) Google Cloud account credentials JSON file.
 * `-b`, `--backupFile` `<path>`- Filename with backup data. (e.g. backups/full-backup.json).
 * `-n`, `--nodePath` `<path>`- Path to database node to start (e.g. collectionA/docB/collectionC).
+* `-y`, `--yes` - Unattended import without confirmation (like hitting "y" from the command line).
 
 ##### Examples
 ###### Import full database
