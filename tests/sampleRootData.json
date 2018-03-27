@@ -1,0 +1,31 @@
+{
+  "__collections__": {
+    "collectionA": {
+      "docA": {
+        "name": "john",
+        "__collections__": {
+          "contacts": {
+            "contactDocId": {
+              "name": "sam",
+              "__collections__": {}
+            }
+          }
+        }
+      },
+      "docB": {
+        "name": "billy",
+        "__collections__": {}
+      }
+    },
+    "collectionB": {
+      "docC": {
+        "name": "annie",
+        "__collections__": {}
+      },
+      "docD": {
+        "name": "jane",
+        "__collections__": {}
+      }
+    }
+  }
+}

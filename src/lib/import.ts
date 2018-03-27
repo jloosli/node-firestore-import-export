@@ -1,14 +1,14 @@
 import * as admin from "firebase-admin";
 import {isLikeDocument, isRootOfDatabase} from "./firestore-helpers";
 import {ICollection} from "./interfaces";
-import {array_chunks} from "./helpers";
+import {array_chunks, unserializeSpecialTypes} from "./helpers";
 
 const importData = (data: any,
                     startingRef: admin.firestore.Firestore |
                       FirebaseFirestore.DocumentReference |
                       FirebaseFirestore.CollectionReference): Promise<any> => {
 
-  const dataToImport = Object.assign({}, data);
+  const dataToImport = {...data};
   if (isLikeDocument(startingRef)) {
     if (!dataToImport.hasOwnProperty('__collections__')) {
       throw new Error('Root or document reference doesn\'t contain a __collections__ property.');
@@ -56,10 +56,10 @@ const setDocuments = (data: ICollection, startingRef: FirebaseFirestore.Collecti
         });
         delete(data[documentKey]['__collections__']);
       }
-      const documentData: any = {};
-      Object.keys(data[documentKey]).map(field => {
-        documentData[field] = data[documentKey][field];
-      });
+      const documentData: any = unserializeSpecialTypes(data[documentKey], startingRef.firestore);
+      // Object.keys(data[documentKey]).map(field => {
+      //   documentData[field] = unserializeSpecialTypes(data[documentKey][field], startingRef.firestore);
+      // });
       batch.set(startingRef.doc(documentKey), documentData, {merge: true});
     });
     return batch.commit();
