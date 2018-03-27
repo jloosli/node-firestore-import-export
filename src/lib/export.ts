@@ -16,7 +16,6 @@ const exportData = async (startingRef: admin.firestore.Firestore |
       dataPromise = (<FirebaseFirestore.DocumentReference>startingRef).get().then(snapshot => snapshot.data());
     }
     return await Promise.all([collectionsPromise, dataPromise]).then(res => {
-      // return Object.assign({}, {'__collections__': res[0]}, res[1]);
       return {'__collections__': res[0], ...res[1]};
     });
   }
