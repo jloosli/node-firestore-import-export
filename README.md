@@ -108,7 +108,7 @@ firestore-import --accountCredentials path/to/credentials/file.json --backupFile
 
 ##### Import to a specific path
 ```sh
-firestore-export --accountCredentials path/to/credentials/file.json --backupFile /backups/myDatabase.json --nodePath collectionA/document1/collectionCC
+firestore-import --accountCredentials path/to/credentials/file.json --backupFile /backups/myDatabase.json --nodePath collectionA/document1/collectionCC
 ```
 
 ## Contributions
