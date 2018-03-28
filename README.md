@@ -186,7 +186,7 @@ const data = {
 const collectionRef = firebase.firestore().collection('collectionA/docB/collectionC');
 
 firestoreImport(data, collectionRef)
-    .then(data=>console.log(data));
+    .then(()=>console.log('Data was imported.'));
 ```
 
 ## Contributions
