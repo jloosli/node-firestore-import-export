@@ -63,7 +63,7 @@ const getDocuments = async (collectionRef: FirebaseFirestore.CollectionReference
       allDocuments = await collectionRef.get();
       deadlineError = false;
     } catch (e) {
-      if (e.message === 'Deadline Exceeded') {
+      if (e.code && e.code === 4) {
         console.log(`Deadline Error in getDocuments()...waiting ${SLEEP_TIME / 1000} second(s) before retrying`);
         await sleep(SLEEP_TIME);
         deadlineError = true;
