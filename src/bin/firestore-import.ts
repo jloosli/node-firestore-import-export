@@ -6,7 +6,7 @@ import * as process from 'process';
 import * as fs from 'fs';
 import firestoreImport from '../lib/import';
 import {getCredentialsFromFile, getDBReferenceFromPath, getFirestoreDBReference} from "../lib/firestore-helpers";
-import loadJsonFile = require("load-json-file");
+import * as loadJsonFile from "load-json-file";
 
 const packageInfo = require('../../package.json');
 

@@ -1,5 +1,5 @@
 import * as admin from 'firebase-admin';
-import loadJsonFile = require("load-json-file");
+import * as loadJsonFile from "load-json-file";
 
 
 const getCredentialsFromFile = (credentialsFilename: string): Promise<admin.ServiceAccount> => {
