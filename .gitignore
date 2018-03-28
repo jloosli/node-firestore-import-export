@@ -33,6 +33,7 @@ node_modules/
 *.json
 !package.json
 !tsconfig.json
+!tests/*.json
 
 # Dist
 dist/**

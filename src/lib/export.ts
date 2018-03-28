@@ -1,5 +1,6 @@
-import * as admin from 'firebase-admin';
 import {isLikeDocument, isRootOfDatabase, sleep} from "./firestore-helpers";
+import * as admin from "firebase-admin";
+import {serializeSpecialTypes} from "./helpers";
 
 const SLEEP_TIME = 1000;
 
@@ -15,7 +16,7 @@ const exportData = async (startingRef: admin.firestore.Firestore |
       dataPromise = (<FirebaseFirestore.DocumentReference>startingRef).get().then(snapshot => snapshot.data());
     }
     return await Promise.all([collectionsPromise, dataPromise]).then(res => {
-      return Object.assign({}, {'__collections__': res[0]}, res[1]);
+      return {'__collections__': res[0], ...res[1]};
     });
   }
   else {
@@ -62,7 +63,7 @@ const getDocuments = async (collectionRef: FirebaseFirestore.CollectionReference
       allDocuments = await collectionRef.get();
       deadlineError = false;
     } catch (e) {
-      if (e.message === 'Deadline Exceeded') {
+      if (e.code && e.code === 4) {
         console.log(`Deadline Error in getDocuments()...waiting ${SLEEP_TIME / 1000} second(s) before retrying`);
         await sleep(SLEEP_TIME);
         deadlineError = true;
@@ -77,7 +78,7 @@ const getDocuments = async (collectionRef: FirebaseFirestore.CollectionReference
     documentPromises.push(new Promise(async (resolve) => {
       const docDetails: any = {};
       // console.log(docSnapshot.id, '=>', docSnapshot.data());
-      docDetails[docSnapshot.id] = docSnapshot.data();
+      docDetails[docSnapshot.id] = serializeSpecialTypes(docSnapshot.data());
       const collections = await getCollections(docSnapshot.ref);
       docDetails[docSnapshot.id]['__collections__'] = collections;
       resolve(docDetails);
@@ -89,5 +90,6 @@ const getDocuments = async (collectionRef: FirebaseFirestore.CollectionReference
     });
   return results;
 };
+
 
 export default exportData;

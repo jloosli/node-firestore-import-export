@@ -3,40 +3,8 @@ import firebaseExport from '../src/lib/export';
 import {expect} from 'chai';
 
 const firebasemock: any = require('firebase-mock');
-// import * as firebasemock from 'firebase-mock';
 const DocumentReference: any = require('firebase-mock/src/firestore-document');
-
-const sampleRootData = {
-  __collections__: {
-    collectionA: {
-      docA: {
-        name: 'john',
-        __collections__: {
-          contacts: {
-            contactDocId: {
-              name: 'sam',
-              __collections__: {}
-            }
-          }
-        }
-      },
-      docB: {
-        name: 'billy',
-        __collections__: {}
-      }
-    },
-    collectionB: {
-      docC: {
-        name: 'annie',
-        __collections__: {}
-      },
-      docD: {
-        name: 'jane',
-        __collections__: {}
-      }
-    }
-  }
-};
+const sampleRootData = require('./sampleRootData.json');
 
 const getCollections = function (this: any): Promise<FirebaseFirestore.CollectionReference[]> {
   const self = this;
