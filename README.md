@@ -8,7 +8,27 @@ Firestore data importing and exporting tool.
 [![CircleCI](https://circleci.com/gh/jloosli/node-firestore-import-export.svg?style=svg)](https://circleci.com/gh/jloosli/node-firestore-import-export)
 
 Export a Firestore database, including collections and documents, while keeping the structure 
-intact. Exports a json file with the following format:
+intact. 
+
+## Table of Contents
+
+- [Data format](#data-format)
+- [Installation](#installation)
+- [Retrieving credentials](#retrieving-google-cloud-account-credentials)
+- [Usage](#usage)
+   - [Command line](#command-line)
+     - [Export](#export)
+     - [Import](#import)
+   - [Library](#library)
+     - [Export](#exporting)
+     - [Import](#importing)
+- [Contributions](#contributions)
+
+
+### Data Format
+
+Exports a json file with the following format:
+
 
 ```json
 {
@@ -72,43 +92,100 @@ This downloaded json file contains the proper credentials needed for __node-fire
 
 ## Usage
 
-### Export:
+### Command Line
+
+#### Export
 * `-a`, `--accountCredentials` `<path>` - (required) Google Cloud account credentials JSON file.
 * `-b`, `--backupFile` `<path>`- Filename to store backup. (e.g. backups/full-backup.json).
 * `-n`, `--nodePath` `<path>`- Path to database node to start (e.g. collectionA/docB/collectionC).
 Backs up full database if empty or missing.
 * `-p`, `--prettyPrint` - JSON backups done with pretty-printing.
 
-#### Examples
-##### Export full database
+##### Examples
+###### Export full database
 ```sh
 firestore-export --accountCredentials path/to/credentials/file.json --backupFile /backups/myDatabase.json
 ```
 
-##### Export with pretty printing:
+###### Export with pretty printing
 ```sh
 firestore-export --accountCredentials path/to/credentials/file.json --backupFile /backups/myDatabase.json --prettyPrint
 ```
 
-##### Export from a specific path (and all its children/collections)
+###### Export from a specific path (and all its children/collections)
 ```sh
 firestore-export --accountCredentials path/to/credentials/file.json --backupFile /backups/myDatabase.json --nodePath collectionA/document1/collectionCC
 ```
 
-### Import:
+#### Import
 * `-a`, `--accountCredentials` `<path>` - (required) Google Cloud account credentials JSON file.
 * `-b`, `--backupFile` `<path>`- Filename with backup data. (e.g. backups/full-backup.json).
 * `-n`, `--nodePath` `<path>`- Path to database node to start (e.g. collectionA/docB/collectionC).
 
-#### Examples
-##### Import full database
+##### Examples
+###### Import full database
 ```sh
 firestore-import --accountCredentials path/to/credentials/file.json --backupFile /backups/myDatabase.json
 ```
 
-##### Import to a specific path
+###### Import to a specific path
 ```sh
 firestore-import --accountCredentials path/to/credentials/file.json --backupFile /backups/myDatabase.json --nodePath collectionA/document1/collectionCC
+```
+
+### Library
+The underlying library can be used in a node or web application for importing and exporting data
+in a similar fashion
+
+#### Exporting
+
+```typescript
+import {firestoreExport} from 'node-firestore-import-export';
+import * as firebase from 'firebase-admin';
+
+firebase.initializeApp({
+    apiKey: "AIza....",                             
+    authDomain: "YOUR_APP.firebaseapp.com",         
+    databaseURL: "https://YOUR_APP.firebaseio.com", 
+    storageBucket: "YOUR_APP.appspot.com",          
+    messagingSenderId: "123456789"                  
+});
+
+const collectionRef = firebase.firestore().collection('collectionA/docB/collectionC');
+
+firestoreExport(collectionRef)
+    .then(data=>console.log(data));
+```
+
+#### Importing
+
+```typescript
+import {firestoreImport} from 'node-firestore-import-export';
+import * as firebase from 'firebase-admin';
+
+firebase.initializeApp({
+    apiKey: "AIza....",                             
+    authDomain: "YOUR_APP.firebaseapp.com",         
+    databaseURL: "https://YOUR_APP.firebaseio.com", 
+    storageBucket: "YOUR_APP.appspot.com",          
+    messagingSenderId: "123456789"                  
+});
+
+const data = {
+  docA: {
+    name: 'bob',
+    __collections__: {}
+  },
+  docB: {
+    name: 'jill',
+    __collections__: {}
+  }
+};
+
+const collectionRef = firebase.firestore().collection('collectionA/docB/collectionC');
+
+firestoreImport(data, collectionRef)
+    .then(data=>console.log(data));
 ```
 
 ## Contributions
