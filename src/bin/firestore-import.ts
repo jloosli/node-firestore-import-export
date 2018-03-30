@@ -10,11 +10,13 @@ import * as loadJsonFile from "load-json-file";
 
 const packageInfo = require('../../package.json');
 
+const accountCredentialsEnvironmentKey = 'GOOGLE_APPLICATION_CREDENTIALS';
 const accountCredentialsPathParamKey = 'accountCredentials';
-const accountCredentialsPathParamDescription = 'Google Cloud account credentials JSON file';
+const accountCredentialsPathParamDescription = 'path to Google Cloud account credentials JSON file. If missing, will look ' +
+  `at the ${accountCredentialsEnvironmentKey} environment variable for the path.`;
 
 const backupFileParamKey = 'backupFile';
-const backupFileParamDescription = 'Filename to store backup. (e.g. backups/full-backup.json)';
+const backupFileParamDescription = 'Filename to store backup. (e.g. backups/full-backup.json).';
 
 const nodePathParamKey = 'nodePath';
 const nodePathParamDescription = 'Path to database node (has to be a collection) where import will to start (e.g. collectionA/docB/collectionC).' +
@@ -30,7 +32,7 @@ commander.version(packageInfo.version)
   .option(`-y, --${yesToImportParamKey}`, yesToImportParamDescription)
   .parse(process.argv);
 
-const accountCredentialsPath = commander[accountCredentialsPathParamKey];
+let accountCredentialsPath = commander[accountCredentialsPathParamKey] || process.env[accountCredentialsEnvironmentKey];
 if (!accountCredentialsPath) {
   console.log(colors.bold(colors.red('Missing: ')) + colors.bold(accountCredentialsPathParamKey) + ' - ' + accountCredentialsPathParamDescription);
   commander.help();

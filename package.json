@@ -19,7 +19,7 @@
   "scripts": {
     "export": "node ./dist/bin/firestore-export.js",
     "import": "node ./dist/bin/firestore-import.js",
-    "build": "npm run clean && tsc",
+    "build": "npm run tests && npm run clean && tsc",
     "watch": "tsc -w",
     "clean": "rm -rf dist && mkdir dist",
     "tests": "mocha -r ts-node/register tests/**/*.spec.ts"
