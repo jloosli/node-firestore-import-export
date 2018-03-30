@@ -93,12 +93,21 @@ This downloaded json file contains the proper credentials needed for __node-fire
 ## Usage
 
 ### Command Line
+The path to the account credentials can either be passed with the `-a/--accountCredentials` flag, or placed in the
+`GOOGLE_APPLICATION_CREDENTIALS` environment variable. For example:
+
+```sh
+export GOOGLE_ACCOUNT_CREDENTIALS=path/to/my/credentials.json
+firestore-export -p
+```
 
 #### Export
-* `-a`, `--accountCredentials` `<path>` - (required) Google Cloud account credentials JSON file.
+* `-a`, `--accountCredentials` `<path>` - path to Google Cloud account credentials JSON file. 
+  If missing, will look at the `GOOGLE_APPLICATION_CREDENTIALS` environment variable for the path. 
 * `-b`, `--backupFile` `<path>`- Filename to store backup. (e.g. backups/full-backup.json).
+  Defaults to `firestore-export.json` if missing.
 * `-n`, `--nodePath` `<path>`- Path to database node to start (e.g. collectionA/docB/collectionC).
-Backs up full database if empty or missing.
+  Backs up full database if empty or missing.
 * `-p`, `--prettyPrint` - JSON backups done with pretty-printing.
 
 ##### Examples
@@ -118,7 +127,8 @@ firestore-export --accountCredentials path/to/credentials/file.json --backupFile
 ```
 
 #### Import
-* `-a`, `--accountCredentials` `<path>` - (required) Google Cloud account credentials JSON file.
+* `-a`, `--accountCredentials` `<path>` - path to Google Cloud account credentials JSON file. 
+  If missing, will look at the `GOOGLE_APPLICATION_CREDENTIALS` environment variable for the path. 
 * `-b`, `--backupFile` `<path>`- Filename with backup data. (e.g. backups/full-backup.json).
 * `-n`, `--nodePath` `<path>`- Path to database node to start (e.g. collectionA/docB/collectionC).
 * `-y`, `--yes` - Unattended import without confirmation (like hitting "y" from the command line).
