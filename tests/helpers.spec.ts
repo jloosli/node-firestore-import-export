@@ -2,6 +2,7 @@ import {array_chunks, serializeSpecialTypes, unserializeSpecialTypes} from '../s
 import {expect} from 'chai';
 import 'mocha';
 import * as admin from "firebase-admin";
+import {Firestore, GeoPoint} from '@google-cloud/firestore';
 
 const special = {
   object: {
@@ -76,8 +77,9 @@ describe('Helpers', () => {
   });
 
   describe('unserializeSpecialTypes', () => {
-    const results = unserializeSpecialTypes(serialized);
+    const fs = new Firestore();
+    const results = unserializeSpecialTypes(serialized, fs);
     expect(results.timestamp).to.be.an.instanceof(Date);
-    expect(results.geopoint).to.be.an.instanceof(admin.firestore.GeoPoint);
+    expect(results.geopoint).to.be.an.instanceof(GeoPoint);
   })
 });
