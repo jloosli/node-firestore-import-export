@@ -1,7 +1,5 @@
 import * as admin from "firebase-admin";
-import DocumentReference = admin.firestore.DocumentReference;
-import GeoPoint = admin.firestore.GeoPoint;
-import Firestore = FirebaseFirestore.Firestore;
+import {DocumentReference, Firestore, GeoPoint} from '@google-cloud/firestore'
 
 // From https://stackoverflow.com/questions/8495687/split-array-into-chunks
 const array_chunks = (array: Array<any>, chunk_size: number): Array<Array<any>> => {
