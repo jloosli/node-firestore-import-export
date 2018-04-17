@@ -36,7 +36,7 @@
     "@google-cloud/firestore": "^0.13.0",
     "colors": "^1.2.0-rc0",
     "commander": "^2.14.1",
-    "core-js": "^2.5.3",
+    "core-js": "^2.5.5",
     "firebase-admin": "^5.9.1",
     "firebase-functions": "^0.8.1",
     "load-json-file": "^4.0.0",

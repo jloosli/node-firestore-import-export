@@ -1,9 +1,9 @@
-// From https://stackoverflow.com/questions/8495687/split-array-into-chunks
 import * as admin from "firebase-admin";
 import DocumentReference = admin.firestore.DocumentReference;
 import GeoPoint = admin.firestore.GeoPoint;
 import Firestore = FirebaseFirestore.Firestore;
 
+// From https://stackoverflow.com/questions/8495687/split-array-into-chunks
 const array_chunks = (array: Array<any>, chunk_size: number): Array<Array<any>> => {
   return Array(Math.ceil(array.length / chunk_size))
     .fill(null)
@@ -24,7 +24,11 @@ const serializeSpecialTypes = (data: any) => {
     } else if (value instanceof DocumentReference) {
       value = {__datatype__: 'documentReference', value: value.path};
     } else if (value === Object(value)) {
+      let isArray = Array.isArray(value);
       value = serializeSpecialTypes(value);
+      if (isArray) {
+        value = Object.keys(value).map(key => value[key]);
+      }
     }
     cleaned[key] = value;
   });
@@ -49,11 +53,16 @@ const unserializeSpecialTypes = (data: any, fs: Firestore) => {
             break;
         }
       } else {
+        let isArray = Array.isArray(value);
         value = unserializeSpecialTypes(value, fs);
+        if (isArray) {
+          value = Object.keys(value).map(key => value[key])
+        }
       }
     }
     cleaned[key] = value;
   });
   return cleaned;
 };
+
 export {array_chunks, serializeSpecialTypes, unserializeSpecialTypes};
