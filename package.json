@@ -11,7 +11,9 @@
     "firebase",
     "firestore",
     "import",
-    "export"
+    "export",
+    "backup",
+    "restore"
   ],
   "bugs": {
     "url": "https://github.com/jloosli/node-firestore-import-export/issues"
