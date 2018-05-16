@@ -13,7 +13,9 @@ const exportData = async (startingRef: admin.firestore.Firestore |
     if (isRootOfDatabase(startingRef)) {
       dataPromise = Promise.resolve({});
     } else {
-      dataPromise = (<FirebaseFirestore.DocumentReference>startingRef).get().then(snapshot => snapshot.data());
+      dataPromise = (<FirebaseFirestore.DocumentReference>startingRef).get()
+        .then(snapshot => snapshot.data())
+        .then(data => serializeSpecialTypes(data));
     }
     return await Promise.all([collectionsPromise, dataPromise]).then(res => {
       return {'__collections__': res[0], ...res[1]};
