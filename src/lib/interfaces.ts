@@ -1,11 +1,11 @@
 export interface IDocument {
-    __collections__: {
-        [id: string]: ICollection;
-    };
+  __collections__: {
+    [id: string]: ICollection;
+  };
 
-    [id: string]: any;
+  [id: string]: any;
 }
 
 export interface ICollection {
-    [id: string]: IDocument;
+  [id: string]: IDocument;
 }

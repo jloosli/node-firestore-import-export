@@ -13,7 +13,8 @@ const exportData = async (startingRef: admin.firestore.Firestore |
     if (isRootOfDatabase(startingRef)) {
       dataPromise = Promise.resolve({});
     } else {
-      dataPromise = (<FirebaseFirestore.DocumentReference>startingRef).get().then(snapshot => snapshot.data());
+      dataPromise = (<FirebaseFirestore.DocumentReference>startingRef).get()
+        .then(snapshot => snapshot.data());
     }
     return await Promise.all([collectionsPromise, dataPromise]).then(res => {
       return {'__collections__': res[0], ...res[1]};
@@ -79,8 +80,7 @@ const getDocuments = async (collectionRef: FirebaseFirestore.CollectionReference
       const docDetails: any = {};
       // console.log(docSnapshot.id, '=>', docSnapshot.data());
       docDetails[docSnapshot.id] = serializeSpecialTypes(docSnapshot.data());
-      const collections = await getCollections(docSnapshot.ref);
-      docDetails[docSnapshot.id]['__collections__'] = collections;
+      docDetails[docSnapshot.id]['__collections__'] = await getCollections(docSnapshot.ref);
       resolve(docDetails);
     }));
   });
