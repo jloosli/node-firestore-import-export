@@ -14,7 +14,8 @@ const exportData = async (startingRef: admin.firestore.Firestore |
       dataPromise = Promise.resolve({});
     } else {
       dataPromise = (<FirebaseFirestore.DocumentReference>startingRef).get()
-        .then(snapshot => snapshot.data());
+        .then(snapshot => snapshot.data())
+        .then(data => serializeSpecialTypes(data));
     }
     return await Promise.all([collectionsPromise, dataPromise]).then(res => {
       return {'__collections__': res[0], ...res[1]};
@@ -78,7 +79,6 @@ const getDocuments = async (collectionRef: FirebaseFirestore.CollectionReference
   allDocuments.forEach((docSnapshot) => {
     documentPromises.push(new Promise(async (resolve) => {
       const docDetails: any = {};
-      // console.log(docSnapshot.id, '=>', docSnapshot.data());
       docDetails[docSnapshot.id] = serializeSpecialTypes(docSnapshot.data());
       docDetails[docSnapshot.id]['__collections__'] = await getCollections(docSnapshot.ref);
       resolve(docDetails);
