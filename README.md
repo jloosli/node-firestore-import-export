@@ -97,7 +97,7 @@ The path to the account credentials can either be passed with the `-a/--accountC
 `GOOGLE_APPLICATION_CREDENTIALS` environment variable. For example:
 
 ```sh
-export GOOGLE_ACCOUNT_CREDENTIALS=path/to/my/credentials.json
+export GOOGLE_APPLICATION_CREDENTIALS=path/to/my/credentials.json
 firestore-export -p
 ```
 
