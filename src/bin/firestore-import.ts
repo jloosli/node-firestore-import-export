@@ -76,10 +76,8 @@ Promise.all([loadJsonFile(backupFile), importPathPromise])
     const [data, pathReference] = res;
     const nodeLocation = (<FirebaseFirestore.DocumentReference | FirebaseFirestore.CollectionReference>pathReference)
       .path || '[database root]';
-    // For some reason, Firestore, DocumentReference, and CollectionReference interfaces
-    // don't show a projectId property even though they do have them.
-    // @todo: Remove any when that is fixed, or find the correct interface
-    const projectID = (<any>pathReference).projectId ||
+    const projectID = ((<any>pathReference)._referencePath && (<any>pathReference)._referencePath._projectId) ||
+      ((<any>pathReference).firestore && (<any>pathReference).firestore._referencePath && (<any>pathReference).firestore._referencePath._projectId) ||
       (<any>pathReference).firestore.projectId;
     const importText = `About to import data ${backupFile} to the '${projectID}' firestore at '${nodeLocation}'.`;
     console.log(`\n\n${colors.bold(colors.blue(importText))}`);
