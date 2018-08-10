@@ -12,7 +12,10 @@ const getFirestoreDBReference = (credentials: admin.ServiceAccount): admin.fires
         databaseURL: `https://${(credentials as any).project_id}.firebaseio.com`
     });
 
-    return admin.firestore();
+    let firestore = admin.firestore();
+    const settings = {timestampsInSnapshots: true};
+    firestore.settings(settings);
+    return firestore;
 };
 
 const getDBReferenceFromPath = (db: admin.firestore.Firestore, dataPath?: string): admin.firestore.Firestore |
