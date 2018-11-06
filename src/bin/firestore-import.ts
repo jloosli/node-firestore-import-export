@@ -6,7 +6,8 @@ import * as process from 'process';
 import * as fs from 'fs';
 import firestoreImport from '../lib/import';
 import {getCredentialsFromFile, getDBReferenceFromPath, getFirestoreDBReference} from "../lib/firestore-helpers";
-import * as loadJsonFile from "load-json-file";
+import loadJsonFile from "load-json-file";
+import * as admin from 'firebase-admin';
 
 const packageInfo = require('../../package.json');
 
@@ -68,18 +69,16 @@ const importPathPromise = getCredentialsFromFile(accountCredentialsPath)
 
 const unattendedConfirmation = commander[yesToImportParamKey];
 
-Promise.all([loadJsonFile(backupFile), importPathPromise])
+Promise.all([loadJsonFile(backupFile), importPathPromise, getCredentialsFromFile(accountCredentialsPath)])
   .then((res) => {
     if (unattendedConfirmation) {
       return res;
     }
-    const [data, pathReference] = res;
+    const [data, pathReference, credentials] = res;
     const nodeLocation = (<FirebaseFirestore.DocumentReference | FirebaseFirestore.CollectionReference>pathReference)
       .path || '[database root]';
-    const projectID = ((<any>pathReference)._referencePath && (<any>pathReference)._referencePath._projectId) ||
-      ((<any>pathReference).firestore && (<any>pathReference).firestore._referencePath && (<any>pathReference).firestore._referencePath._projectId) ||
-      (<any>pathReference).firestore.projectId;
-    const importText = `About to import data ${backupFile} to the '${projectID}' firestore at '${nodeLocation}'.`;
+    const projectID = (credentials as any).project_id;
+    const importText = `About to import data '${backupFile}' to the '${projectID}' firestore at '${nodeLocation}'.`;
     console.log(`\n\n${colors.bold(colors.blue(importText))}`);
     console.log(colors.bgYellow(colors.blue(' === Warning: This will overwrite existing data. Do you want to proceed? === ')));
     return new Promise((resolve, reject) => {
