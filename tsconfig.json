@@ -12,14 +12,14 @@
       "./src/lib"
     ],
     "lib": [
-      "es6",
       "es2015",
+      "es2015.promise",
       "es2017",
       "dom",
       "es2017.object"
     ],
     "typeRoots": [
-      "node_modules/@types",
+      "./node_modules/@types",
       "./@types"
     ]
   },
