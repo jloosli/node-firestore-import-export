@@ -43,7 +43,7 @@ const unserializeSpecialTypes = (data: any, fs: Firestore) => {
       if ('__datatype__' in value && 'value' in value) {
         switch (value.__datatype__) {
           case 'timestamp':
-            value = new admin.firestore.Timestamp(value.seconds, value.nanoseconds);
+            value = new admin.firestore.Timestamp(value.value._seconds, value.value._nanoseconds);
             break;
           case 'geopoint':
             value = new admin.firestore.GeoPoint(value.value._latitude, value.value._longitude);
