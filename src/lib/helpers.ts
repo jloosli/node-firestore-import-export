@@ -17,8 +17,8 @@ const serializeSpecialTypes = (data: any) => {
   const cleaned: any = {};
   Object.keys(data).map(key => {
     let value = data[key];
-    if (value instanceof Date) {
-      value = {__datatype__: 'timestamp', value: value.toISOString()};
+    if (value instanceof admin.firestore.Timestamp) {
+      value = {__datatype__: 'timestamp', value: {seconds: value.seconds, nanoseconds: value.nanoseconds}};
     } else if (value instanceof GeoPoint) {
       value = {__datatype__: 'geopoint', value: value};
     } else if (value instanceof DocumentReference) {
@@ -43,7 +43,7 @@ const unserializeSpecialTypes = (data: any, fs: Firestore) => {
       if ('__datatype__' in value && 'value' in value) {
         switch (value.__datatype__) {
           case 'timestamp':
-            value = new Date(value.value);
+            value = new admin.firestore.Timestamp(value.seconds, value.nanoseconds);
             break;
           case 'geopoint':
             value = new admin.firestore.GeoPoint(value.value._latitude, value.value._longitude);

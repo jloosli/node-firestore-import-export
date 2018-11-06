@@ -1,8 +1,7 @@
-import {array_chunks, serializeSpecialTypes, unserializeSpecialTypes} from '../src/lib/helpers';
+import {array_chunks, serializeSpecialTypes} from '../src/lib/helpers';
 import {expect} from 'chai';
 import 'mocha';
 import * as admin from "firebase-admin";
-import * as firebase from 'firebase/app';
 import 'firebase/firestore';
 
 const FirebaseServer = require('firebase-server');
@@ -10,13 +9,13 @@ const FirebaseServer = require('firebase-server');
 const special = {
   object: {
     name: 'object',
-    timestamp: new Date()
+    timestamp: new admin.firestore.Timestamp(1541579025, 0)
   },
   array: {
     0: 1,
     1: new Date()
   },
-  timestamp: new Date(),
+  timestamp: new admin.firestore.Timestamp(1541579025, 0),
   geopoint: new admin.firestore.GeoPoint(12.3433, -111.324),
   number: 234234.234,
 };
@@ -26,19 +25,28 @@ const serialized = {
     "name": "object",
     "timestamp": {
       "__datatype__": "timestamp",
-      "value": "2018-03-27T18:02:15.127Z"
+      "value": {
+        "_seconds": 1541579025,
+        "nanoseconds": 0
+      }
     }
   },
   "array": {
     "0": 1,
     "1": {
       "__datatype__": "timestamp",
-      "value": "2018-03-27T18:02:15.127Z"
+      "value": {
+        "_seconds": 1541579025,
+        "nanoseconds": 0
+      }
     }
   },
   "timestamp": {
     "__datatype__": "timestamp",
-    "value": "2018-03-27T18:02:15.127Z"
+    "value": {
+      "_seconds": 1541579025,
+      "nanoseconds": 0
+    }
   },
   "geopoint": {
     "__datatype__": "geopoint",
@@ -85,7 +93,7 @@ describe('Helpers', () => {
   //     databaseURL: `ws://localhost:5000`
   //   }, 'TestingEnvironment');
   //   const results = unserializeSpecialTypes(serialized, admin.firestore());
-  //   expect(results.timestamp).to.be.an.instanceof(Date);
+  //   expect(results.timestamp).to.be.an.instanceof(admin.firestore.Timestamp);
   //   expect(results.geopoint).to.be.an.instanceof(admin.firestore.GeoPoint);
   //   FirebaseServer.close(console.log(`\n — server closed — `));
   // })
