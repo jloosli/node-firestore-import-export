@@ -31,7 +31,7 @@
     "firestore-import": "./dist/bin/firestore-import.js"
   },
   "engines": {
-    "npm": ">=6.0"
+    "node": ">=8.0"
   },
   "preferGlobal": true,
   "dependencies": {
