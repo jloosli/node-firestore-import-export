@@ -6,6 +6,7 @@
     "sourceMap": false,
     "strict": true,
     "declaration": true,
+    "noImplicitAny": true,
     "outDir": "./dist/",
     "rootDirs": [
       "./src/bin",

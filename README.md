@@ -37,6 +37,24 @@ Exports a json file with the following format:
       "docA": {
         "name": "Big Co",
         "employee_count": 2012,
+        "created": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 12343456,
+            "_nanoseconds": 7890
+          }
+        },
+        "location": {
+          "__datatype__": "geopoint",
+          "value": {
+            "_latitude": -123.456789,
+            "_longitude": 34.5678
+          }
+        },
+        "AdministratorRef": {
+          "__datatype__": "documentReference",
+          "value": "path/to/the/document"
+        },
         "__collections__": {
           "employees": ...,
           "products": ...
@@ -59,6 +77,23 @@ Imports need to be from a file with the same structure (e.g. from an exported fi
 
 __Be careful!__ This can easily overwrite or mess up your data if you import 
 to the wrong location.
+
+#### Special Datatypes
+
+Three types of data are serialized in the export: 
+
+* Timestamps
+* Geopoints
+* DocumentReferences
+
+They each are serialized in the following format:
+
+```json
+{
+  "__datatype__": "timestamp|geopoint|documentReference",
+  "value": "The serialized value"
+}
+```
 
 ## Installation
 Install using [__npm__](https://www.npmjs.com/).

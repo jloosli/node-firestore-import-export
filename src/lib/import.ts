@@ -1,7 +1,7 @@
 import * as admin from "firebase-admin";
 import {isLikeDocument, isRootOfDatabase} from "./firestore-helpers";
-import {ICollection} from "./interfaces";
 import {array_chunks, unserializeSpecialTypes} from "./helpers";
+import {ICollection} from "../interfaces/ICollection";
 
 const importData = (data: any,
                     startingRef: admin.firestore.Firestore |

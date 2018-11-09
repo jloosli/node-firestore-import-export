@@ -27,7 +27,7 @@ const serialized = {
       "__datatype__": "timestamp",
       "value": {
         "_seconds": 1541579025,
-        "nanoseconds": 0
+        "_nanoseconds": 0
       }
     }
   },
@@ -37,7 +37,7 @@ const serialized = {
       "__datatype__": "timestamp",
       "value": {
         "_seconds": 1541579025,
-        "nanoseconds": 0
+        "_nanoseconds": 0
       }
     }
   },
@@ -45,7 +45,7 @@ const serialized = {
     "__datatype__": "timestamp",
     "value": {
       "_seconds": 1541579025,
-      "nanoseconds": 0
+      "_nanoseconds": 0
     }
   },
   "geopoint": {
@@ -84,7 +84,13 @@ describe('Helpers', () => {
     it('should take special types and serialize them as expected.', () => {
       const results = serializeSpecialTypes(special);
       expect(results.timestamp).to.include.all.keys('__datatype__', 'value');
+      expect(results.geopoint).to.include.all.keys('__datatype__', 'value');
     });
+
+    it('should handle timestamp', () => {
+      const results = serializeSpecialTypes(special);
+      expect(results.timestamp.value).to.include.all.keys('_seconds', '_nanoseconds');
+    })
   });
 
   // describe('unserializeSpecialTypes', () => {

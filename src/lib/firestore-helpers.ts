@@ -1,6 +1,6 @@
 import * as admin from 'firebase-admin';
 import loadJsonFile from "load-json-file";
-import {IFirebaseCredentials} from "./interfaces";
+import {IFirebaseCredentials} from "../interfaces/IFirebaseCredentials";
 
 
 const getCredentialsFromFile = (credentialsFilename: string): Promise<IFirebaseCredentials> => {
