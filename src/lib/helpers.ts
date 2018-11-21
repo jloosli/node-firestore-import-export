@@ -86,6 +86,15 @@ const unserializeSpecialTypes = (data: any, fs: Firestore) => {
           cleanedValue = Object.keys(rawValue).map(key => rawValue[key])
         }
       }
+    } else if(typeof rawValue === 'boolean') {
+      cleanedValue = rawValue;
+    } else if(typeof rawValue === 'string') {
+      cleanedValue = rawValue;
+    } else if(typeof rawValue === 'number') {
+      cleanedValue = rawValue;
+    } else { //still does not handle Maps
+      console.error("UNKNOWN TYPE: " + rawValue);
+      throw new Error("UNKNOWN TYPE: " + rawValue + ", possibly a Map or some new type added to Firestore?");
     }
     cleaned[key] = cleanedValue;
   });
