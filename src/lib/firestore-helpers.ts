@@ -13,7 +13,6 @@ const getFirestoreDBReference = (credentials: IFirebaseCredentials): admin.fires
     databaseURL: `https://${(credentials as any).project_id}.firebaseio.com`,
   });
 
-
   const firestore = admin.firestore();
   firestore.settings({timestampsInSnapshots: true});
   return firestore;
