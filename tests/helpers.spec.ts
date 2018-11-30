@@ -2,7 +2,6 @@ import {array_chunks, serializeSpecialTypes, unserializeSpecialTypes} from '../s
 import {expect} from 'chai';
 import 'mocha';
 import * as admin from "firebase-admin";
-import 'firebase/firestore';
 
 const special = {
   object: {
