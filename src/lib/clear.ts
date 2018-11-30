@@ -1,7 +1,5 @@
-import {isLikeDocument, isRootOfDatabase, sleep} from "./firestore-helpers";
-import * as admin from "firebase-admin";
-import {serializeSpecialTypes} from "./helpers";
-import QueryDocumentSnapshot = FirebaseFirestore.QueryDocumentSnapshot;
+import {isLikeDocument, isRootOfDatabase, sleep} from './firestore-helpers';
+import * as admin from 'firebase-admin';
 import DocumentReference = FirebaseFirestore.DocumentReference;
 
 const SLEEP_TIME = 1000;
@@ -15,8 +13,7 @@ const clearData = async (startingRef: admin.firestore.Firestore |
       promises.push(startingRef.delete() as Promise<any>);
     }
     return Promise.all(promises);
-  }
-  else {
+  } else {
     return clearDocuments(<FirebaseFirestore.CollectionReference>startingRef);
   }
 };
@@ -54,7 +51,7 @@ const clearDocuments = async (collectionRef: FirebaseFirestore.CollectionReferen
       deadlineError = false;
     } catch (e) {
       if (e.code && e.code === 4) {
-        console.log(`Deadline Error in getDocuments()...waiting ${SLEEP_TIME / 1000} second(s) before retrying`);
+        console.log(`Deadline Error in listDocuments()...waiting ${SLEEP_TIME / 1000} second(s) before retrying`);
         await sleep(SLEEP_TIME);
         deadlineError = true;
       } else {
@@ -62,21 +59,12 @@ const clearDocuments = async (collectionRef: FirebaseFirestore.CollectionReferen
       }
     }
   } while (deadlineError || !allDocuments);
-  const results: any = {};
   const documentPromises: Array<Promise<object>> = [];
-  allDocuments.forEach((docRef:DocumentReference) => {
-    documentPromises.push(new Promise(async (resolve) => {
-      const docDetails: any = {};
-      docDetails[docRef.id]['__collections__'] = await clearCollections(docRef);
-      resolve(docDetails);
-    }));
+  allDocuments.forEach((docRef: DocumentReference) => {
+    documentPromises.push(clearCollections(docRef));
+    documentPromises.push(docRef.delete());
   });
-  (await Promise.all(documentPromises))
-    .map((res: any) => {
-      Object.keys(res).map(key => (<any>results)[key] = res[key]);
-    });
-  return results;
+  return Promise.all(documentPromises);
 };
-
 
 export default clearData;

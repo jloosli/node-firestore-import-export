@@ -3,7 +3,7 @@ import * as commander from 'commander';
 import * as colors from 'colors';
 import * as process from 'process';
 import * as fs from 'fs';
-import firestoreExport from '../lib/export';
+import {firestoreExport} from '../lib';
 import {getCredentialsFromFile, getDBReferenceFromPath, getFirestoreDBReference} from '../lib/firestore-helpers';
 
 const packageInfo = require('../../package.json');

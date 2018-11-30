@@ -4,7 +4,7 @@ import * as prompt from 'prompt';
 import * as colors from 'colors';
 import * as process from 'process';
 import * as fs from 'fs';
-import firestoreImport from '../lib/import';
+import {firestoreImport} from '../lib';
 import {getCredentialsFromFile, getDBReferenceFromPath, getFirestoreDBReference} from '../lib/firestore-helpers';
 import loadJsonFile from 'load-json-file';
 
