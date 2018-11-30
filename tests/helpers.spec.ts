@@ -1,10 +1,8 @@
-import {array_chunks, serializeSpecialTypes} from '../src/lib/helpers';
+import {array_chunks, serializeSpecialTypes, unserializeSpecialTypes} from '../src/lib/helpers';
 import {expect} from 'chai';
 import 'mocha';
 import * as admin from "firebase-admin";
 import 'firebase/firestore';
-
-const FirebaseServer = require('firebase-server');
 
 const special = {
   object: {
@@ -19,6 +17,8 @@ const special = {
   geopoint: new admin.firestore.GeoPoint(12.3433, -111.324),
   number: 234234.234,
 };
+
+const sampleExportedDoc = require('./sampleExportedDoc.json');
 
 const serialized = {
   "object": {
@@ -93,14 +93,12 @@ describe('Helpers', () => {
     })
   });
 
-  // describe('unserializeSpecialTypes', () => {
-  //   new FirebaseServer(5000, 'localhost');
-  //   const app = firebase.initializeApp({
-  //     databaseURL: `ws://localhost:5000`
-  //   }, 'TestingEnvironment');
-  //   const results = unserializeSpecialTypes(serialized, admin.firestore());
-  //   expect(results.timestamp).to.be.an.instanceof(admin.firestore.Timestamp);
-  //   expect(results.geopoint).to.be.an.instanceof(admin.firestore.GeoPoint);
-  //   FirebaseServer.close(console.log(`\n — server closed — `));
-  // })
+  describe('unserializeSpecialTypes', () => {
+    admin.initializeApp();
+    const results = unserializeSpecialTypes(sampleExportedDoc);
+    expect(results.sampleExportedDoc.timestamp).to.be.an.instanceof(admin.firestore.Timestamp);
+    expect(results.sampleExportedDoc.geopoint).to.be.an.instanceof(admin.firestore.GeoPoint);
+    expect(results.sampleExportedDoc.documentRef).to.be.an.instanceof(admin.firestore.DocumentReference);
+    expect(results.sampleExportedDoc.documentRef).to.be.an.instanceof(admin.firestore.DocumentReference);
+  })
 });

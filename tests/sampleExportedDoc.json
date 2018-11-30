@@ -1,0 +1,56 @@
+{
+  "sampleExportedDoc": {
+    "mixedArray": [
+      "string",
+      {
+        "__datatype__": "documentReference",
+        "value": "test_data/EhUH0qy0ZHJ50jkwtwzr"
+      },
+      {
+        "__datatype__": "geopoint",
+        "value": {
+          "_latitude": 12.5135747,
+          "_longitude": -158.274618751
+        }
+      }
+    ],
+    "nullField": null,
+    "string": "This is the string field in action",
+    "boolean": true,
+    "arrayOfStrings": [
+      "one",
+      "two",
+      "three"
+    ],
+    "object": {
+      "timestamp": {
+        "__datatype__": "timestamp",
+        "value": {
+          "_seconds": 1543579505,
+          "_nanoseconds": 0
+        }
+      },
+      "name": "timestamp object"
+    },
+    "number": 125135581,
+    "timestamp": {
+      "__datatype__": "timestamp",
+      "value": {
+        "_seconds": 1543579505,
+        "_nanoseconds": 0
+      }
+    },
+    "documentRef": {
+      "__datatype__": "documentReference",
+      "value": "test_data/EhUH0qy0ZHJ50jkwtwzr"
+    },
+    "geopoint": {
+      "__datatype__": "geopoint",
+      "value": {
+        "_latitude": 12.5135747,
+        "_longitude": -158.274618751
+      }
+    },
+    "__collections__": {}
+  }
+}

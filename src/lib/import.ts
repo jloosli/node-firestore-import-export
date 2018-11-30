@@ -56,7 +56,7 @@ const setDocuments = (data: ICollection, startingRef: FirebaseFirestore.Collecti
         });
         delete(data[documentKey]['__collections__']);
       }
-      const documentData: any = unserializeSpecialTypes(data[documentKey], startingRef.firestore);
+      const documentData: any = unserializeSpecialTypes(data[documentKey]);
       batch.set(startingRef.doc(documentKey), documentData, {merge: true});
     });
     return batch.commit();
