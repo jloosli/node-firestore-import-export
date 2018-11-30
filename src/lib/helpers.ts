@@ -1,7 +1,7 @@
-import * as admin from "firebase-admin";
-import {ITimestamp} from "../interfaces/ITimestamp";
-import {IGeopoint} from "../interfaces/IGeopoint";
-import {IDocumentReference} from "../interfaces/IDocumentReference";
+import * as admin from 'firebase-admin';
+import {ITimestamp} from '../interfaces/ITimestamp';
+import {IGeopoint} from '../interfaces/IGeopoint';
+import {IDocumentReference} from '../interfaces/IDocumentReference';
 import DocumentReference = admin.firestore.DocumentReference;
 import GeoPoint = admin.firestore.GeoPoint;
 
@@ -24,21 +24,21 @@ const serializeSpecialTypes = (data: any) => {
         __datatype__: 'timestamp',
         value: {
           _seconds: rawValue.seconds,
-          _nanoseconds: rawValue.nanoseconds
-        }
+          _nanoseconds: rawValue.nanoseconds,
+        },
       } as ITimestamp;
     } else if (rawValue instanceof GeoPoint) {
       rawValue = {
         __datatype__: 'geopoint',
         value: {
           _latitude: rawValue.latitude,
-          _longitude: rawValue.longitude
-        }
+          _longitude: rawValue.longitude,
+        },
       } as IGeopoint;
     } else if (rawValue instanceof DocumentReference) {
       rawValue = {
         __datatype__: 'documentReference',
-        value: rawValue.path
+        value: rawValue.path,
       } as IDocumentReference;
     } else if (rawValue === Object(rawValue)) {
       let isArray = Array.isArray(rawValue);
@@ -56,7 +56,7 @@ const unserializeSpecialTypes = (data: any): any => {
   if (isScalar(data)) {
     return data;
   } else if (Array.isArray(data)) {
-    return data.map((val: any) => unserializeSpecialTypes(val))
+    return data.map((val: any) => unserializeSpecialTypes(val));
   } else if (data instanceof Object) {
     let rawValue = {...data}; // Object.assign({}, data);
     if ('__datatype__' in rawValue && 'value' in rawValue) {
@@ -86,11 +86,11 @@ const unserializeSpecialTypes = (data: any): any => {
     }
     return rawValue;
   }
-}
+};
 
 const isScalar = (val: any) => (typeof val === 'string' || val instanceof String)
   || (typeof val === 'number' && isFinite(val))
   || (val === null)
-  || (typeof val === 'boolean')
+  || (typeof val === 'boolean');
 
 export {array_chunks, serializeSpecialTypes, unserializeSpecialTypes};

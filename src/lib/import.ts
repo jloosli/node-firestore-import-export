@@ -1,7 +1,7 @@
-import * as admin from "firebase-admin";
-import {isLikeDocument, isRootOfDatabase} from "./firestore-helpers";
-import {array_chunks, unserializeSpecialTypes} from "./helpers";
-import {ICollection} from "../interfaces/ICollection";
+import * as admin from 'firebase-admin';
+import {isLikeDocument, isRootOfDatabase} from './firestore-helpers';
+import {array_chunks, unserializeSpecialTypes} from './helpers';
+import {ICollection} from '../interfaces/ICollection';
 
 const importData = (data: any,
                     startingRef: admin.firestore.Firestore |
@@ -51,7 +51,7 @@ const setDocuments = (data: ICollection, startingRef: FirebaseFirestore.Collecti
         Object.keys(data[documentKey]['__collections__']).map(collection => {
           collections.push({
             path: startingRef.doc(documentKey).collection(collection),
-            collection: data[documentKey]['__collections__'][collection]
+            collection: data[documentKey]['__collections__'][collection],
           });
         });
         delete (data[documentKey]['__collections__']);
@@ -65,7 +65,7 @@ const setDocuments = (data: ICollection, startingRef: FirebaseFirestore.Collecti
     .then(() => {
       return collections.map((col) => {
         return setDocuments(col.collection, col.path, mergeWithExisting);
-      })
+      });
     })
     .then(subCollectionPromises => Promise.all(subCollectionPromises))
     .catch(err => {

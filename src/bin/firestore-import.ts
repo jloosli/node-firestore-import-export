@@ -5,8 +5,8 @@ import * as colors from 'colors';
 import * as process from 'process';
 import * as fs from 'fs';
 import firestoreImport from '../lib/import';
-import {getCredentialsFromFile, getDBReferenceFromPath, getFirestoreDBReference} from "../lib/firestore-helpers";
-import loadJsonFile from "load-json-file";
+import {getCredentialsFromFile, getDBReferenceFromPath, getFirestoreDBReference} from '../lib/firestore-helpers';
+import loadJsonFile from 'load-json-file';
 
 const packageInfo = require('../../package.json');
 
@@ -42,7 +42,7 @@ if (!accountCredentialsPath) {
 if (!fs.existsSync(accountCredentialsPath)) {
   console.log(colors.bold(colors.red('Account credentials file does not exist: ')) + colors.bold(accountCredentialsPath));
   commander.help();
-  process.exit(1)
+  process.exit(1);
 }
 
 const backupFile = commander[backupFileParamKey];
@@ -55,7 +55,7 @@ if (!backupFile) {
 if (!fs.existsSync(backupFile)) {
   console.log(colors.bold(colors.red('Backup file does not exist: ')) + colors.bold(backupFile));
   commander.help();
-  process.exit(1)
+  process.exit(1);
 }
 
 const nodePath = commander[nodePathParamKey];
@@ -86,9 +86,9 @@ Promise.all([loadJsonFile(backupFile), importPathPromise, getCredentialsFromFile
       prompt.get({
         properties: {
           response: {
-            description: colors.red(`Proceed with import? [y/N] `)
-          }
-        }
+            description: colors.red(`Proceed with import? [y/N] `),
+          },
+        },
       }, (err: Error, result: any) => {
         if (err) {
           return reject(err);
@@ -100,8 +100,8 @@ Promise.all([loadJsonFile(backupFile), importPathPromise, getCredentialsFromFile
           default:
             reject('Import aborted.');
         }
-      })
-    })
+      });
+    });
   })
   .then((res: any) => {
     const [data, pathReference] = res;

@@ -1,4 +1,4 @@
-import {IDocument} from "./IDocument";
+import {IDocument} from './IDocument';
 
 export interface ICollection {
   [id: string]: IDocument;

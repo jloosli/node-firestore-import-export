@@ -1,6 +1,6 @@
-import {isLikeDocument, isRootOfDatabase, sleep} from "./firestore-helpers";
-import * as admin from "firebase-admin";
-import {serializeSpecialTypes} from "./helpers";
+import {isLikeDocument, isRootOfDatabase, sleep} from './firestore-helpers';
+import * as admin from 'firebase-admin';
+import {serializeSpecialTypes} from './helpers';
 
 const SLEEP_TIME = 1000;
 
@@ -20,8 +20,7 @@ const exportData = async (startingRef: admin.firestore.Firestore |
     return await Promise.all([collectionsPromise, dataPromise]).then(res => {
       return {'__collections__': res[0], ...res[1]};
     });
-  }
-  else {
+  } else {
     return await getDocuments(<FirebaseFirestore.CollectionReference>startingRef);
   }
 };
@@ -52,7 +51,7 @@ const getCollections = async (startingRef: admin.firestore.Firestore | FirebaseF
   const results = await Promise.all(collectionPromises);
   const zipped: any = {};
   results.map((res: any, idx: number) => {
-    zipped[collectionNames[idx]] = res
+    zipped[collectionNames[idx]] = res;
   });
   return zipped;
 };

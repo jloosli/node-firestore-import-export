@@ -1,4 +1,4 @@
-import {ISpecialType} from "./ISpecialType";
+import {ISpecialType} from './ISpecialType';
 
 export interface ITimestamp extends ISpecialType {
   __datatype__: 'timestamp';

@@ -4,7 +4,7 @@ import * as colors from 'colors';
 import * as process from 'process';
 import * as fs from 'fs';
 import firestoreExport from '../lib/export';
-import {getCredentialsFromFile, getDBReferenceFromPath, getFirestoreDBReference} from "../lib/firestore-helpers";
+import {getCredentialsFromFile, getDBReferenceFromPath, getFirestoreDBReference} from '../lib/firestore-helpers';
 
 const packageInfo = require('../../package.json');
 
@@ -42,7 +42,7 @@ if (!accountCredentialsPath) {
 if (!fs.existsSync(accountCredentialsPath)) {
   console.log(colors.bold(colors.red('Account credentials file does not exist: ')) + colors.bold(accountCredentialsPath));
   commander.help();
-  process.exit(1)
+  process.exit(1);
 }
 
 const backupPath = commander[backupFileParamKey] || defaultBackupFilename;
@@ -95,7 +95,7 @@ getCredentialsFromFile(accountCredentialsPath)
       console.log(colors.red(error.message));
       process.exit(1);
     } else {
-      console.log(colors.red(error))
+      console.log(colors.red(error));
     }
   });
 

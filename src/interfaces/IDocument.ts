@@ -1,4 +1,4 @@
-import {ICollection} from "./ICollection";
+import {ICollection} from './ICollection';
 
 export interface IDocument {
   __collections__: {

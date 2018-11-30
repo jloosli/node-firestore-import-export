@@ -1,6 +1,6 @@
 import * as admin from 'firebase-admin';
-import loadJsonFile from "load-json-file";
-import {IFirebaseCredentials} from "../interfaces/IFirebaseCredentials";
+import loadJsonFile from 'load-json-file';
+import {IFirebaseCredentials} from '../interfaces/IFirebaseCredentials';
 
 
 const getCredentialsFromFile = (credentialsFilename: string): Promise<IFirebaseCredentials> => {
@@ -10,7 +10,7 @@ const getCredentialsFromFile = (credentialsFilename: string): Promise<IFirebaseC
 const getFirestoreDBReference = (credentials: IFirebaseCredentials): admin.firestore.Firestore => {
   admin.initializeApp({
     credential: admin.credential.cert(credentials as any),
-    databaseURL: `https://${(credentials as any).project_id}.firebaseio.com`
+    databaseURL: `https://${(credentials as any).project_id}.firebaseio.com`,
   });
 
 
@@ -53,5 +53,5 @@ export {
   getDBReferenceFromPath,
   isLikeDocument,
   isRootOfDatabase,
-  sleep
+  sleep,
 };
