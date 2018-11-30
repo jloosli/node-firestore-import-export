@@ -19,9 +19,11 @@ intact.
    - [Command line](#command-line)
      - [Export](#export)
      - [Import](#import)
+     - [Clear](#clear)
    - [Library](#library)
      - [Export](#exporting)
      - [Import](#importing)
+     - [Clear](#clearing)
 - [Contributions](#contributions)
 
 
@@ -98,19 +100,19 @@ They each are serialized in the following format:
 ## Installation
 Install using [__npm__](https://www.npmjs.com/).
 
-```sh
+```bash
 npm install -g node-firestore-import-export
 ```
 
  or [__yarn__](https://yarnpkg.com/en/)
 
-```sh
+```bash
 yarn global add node-firestore-import-export
 ```
 
 Alternatively download the source.
 
-```sh
+```bash
 git clone https://github.com/jloosli/node-firestore-import-export.git
 ```
 
@@ -131,7 +133,7 @@ This downloaded json file contains the proper credentials needed for __node-fire
 The path to the account credentials can either be passed with the `-a/--accountCredentials` flag, or placed in the
 `GOOGLE_APPLICATION_CREDENTIALS` environment variable. For example:
 
-```sh
+```bash
 export GOOGLE_APPLICATION_CREDENTIALS=path/to/my/credentials.json
 firestore-export -p
 ```
@@ -147,17 +149,17 @@ firestore-export -p
 
 ##### Examples
 ###### Export full database
-```sh
+```bash
 firestore-export --accountCredentials path/to/credentials/file.json --backupFile /backups/myDatabase.json
 ```
 
 ###### Export with pretty printing
-```sh
+```bash
 firestore-export --accountCredentials path/to/credentials/file.json --backupFile /backups/myDatabase.json --prettyPrint
 ```
 
 ###### Export from a specific path (and all its children/collections)
-```sh
+```bash
 firestore-export --accountCredentials path/to/credentials/file.json --backupFile /backups/myDatabase.json --nodePath collectionA/document1/collectionCC
 ```
 
@@ -170,13 +172,26 @@ firestore-export --accountCredentials path/to/credentials/file.json --backupFile
 
 ##### Examples
 ###### Import full database
-```sh
+```bash
 firestore-import --accountCredentials path/to/credentials/file.json --backupFile /backups/myDatabase.json
 ```
 
 ###### Import to a specific path
-```sh
+```bash
 firestore-import --accountCredentials path/to/credentials/file.json --backupFile /backups/myDatabase.json --nodePath collectionA/document1/collectionCC
+```
+
+#### Clear
+* `-a`, `--accountCredentials` `<path>` - path to Google Cloud account credentials JSON file. 
+  If missing, will look at the `GOOGLE_APPLICATION_CREDENTIALS` environment variable for the path. 
+* `-n`, `--nodePath` `<path>`- Path to database node to start (e.g. collectionA/docB/collectionC).
+* `-y`, `--yes` - Unattended clear without confirmation (like hitting "y" from the command line). Command will wait 5
+  seconds so you can `Ctrl-C` to stop.
+
+##### Example
+###### Clear everything under a specific node
+```bash
+firestore-clear --accountCredentials path/to/credentials/file.json --yes
 ```
 
 ### Library
@@ -232,6 +247,26 @@ const collectionRef = firebase.firestore().collection('collectionA/docB/collecti
 
 firestoreImport(data, collectionRef)
     .then(()=>console.log('Data was imported.'));
+```
+
+#### Clearing
+
+```typescript
+import {firestoreClear} from 'node-firestore-import-export';
+import * as firebase from 'firebase-admin';
+
+firebase.initializeApp({
+    apiKey: "AIza....",                             
+    authDomain: "YOUR_APP.firebaseapp.com",         
+    databaseURL: "https://YOUR_APP.firebaseio.com", 
+    storageBucket: "YOUR_APP.appspot.com",          
+    messagingSenderId: "123456789"                  
+});
+
+const collectionRef = firebase.firestore().collection('collectionA/docB/collectionC');
+
+firestoreClear(collectionRef)
+    .then(()=>console.log('Everything under collectionA/docB/collectionC was removed.'));
 ```
 
 ## Contributions
