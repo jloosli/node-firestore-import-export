@@ -4,7 +4,6 @@ import {IGeopoint} from "../interfaces/IGeopoint";
 import {IDocumentReference} from "../interfaces/IDocumentReference";
 import DocumentReference = admin.firestore.DocumentReference;
 import GeoPoint = admin.firestore.GeoPoint;
-import Firestore = FirebaseFirestore.Firestore;
 
 // From https://stackoverflow.com/questions/8495687/split-array-into-chunks
 const array_chunks = (array: Array<any>, chunk_size: number): Array<Array<any>> => {
@@ -53,52 +52,45 @@ const serializeSpecialTypes = (data: any) => {
   return cleaned;
 };
 
-const unserializeSpecialTypes = (data: any, fs: Firestore) => {
-  const cleaned: any = {};
-  Object.keys(data).map(key => {
-    let rawValue: any = data[key];
-    let cleanedValue: any;
-    if (rawValue instanceof Object) {
-      if ('__datatype__' in rawValue && 'value' in rawValue) {
-        switch (rawValue.__datatype__) {
-          case 'timestamp':
-            rawValue = rawValue as ITimestamp;
-            if (rawValue.value instanceof String) {
-              const millis = Date.parse(rawValue.value);
-              cleanedValue = new admin.firestore.Timestamp(millis / 1000, 0);
-            } else {
-              cleanedValue = new admin.firestore.Timestamp(rawValue.value._seconds, rawValue.value._nanoseconds);
-            }
-            break;
-          case 'geopoint':
-            rawValue = rawValue as IGeopoint;
-            cleanedValue = new admin.firestore.GeoPoint(rawValue.value._latitude, rawValue.value._longitude);
-            break;
-          case 'documentReference':
-            rawValue = rawValue as IDocumentReference;
-            rawValue = fs.doc(rawValue.value);
-            break;
-        }
-      } else {
-        let isArray = Array.isArray(rawValue);
-        cleanedValue = unserializeSpecialTypes(rawValue, fs);
-        if (isArray) {
-          cleanedValue = Object.keys(rawValue).map(key => rawValue[key])
-        }
+const unserializeSpecialTypes = (data: any): any => {
+  if (isScalar(data)) {
+    return data;
+  } else if (Array.isArray(data)) {
+    return data.map((val: any) => unserializeSpecialTypes(val))
+  } else if (data instanceof Object) {
+    let rawValue = {...data}; // Object.assign({}, data);
+    if ('__datatype__' in rawValue && 'value' in rawValue) {
+      switch (rawValue.__datatype__) {
+        case 'timestamp':
+          rawValue = rawValue as ITimestamp;
+          if (rawValue.value instanceof String) {
+            const millis = Date.parse(rawValue.value);
+            rawValue = new admin.firestore.Timestamp(millis / 1000, 0);
+          } else {
+            rawValue = new admin.firestore.Timestamp(rawValue.value._seconds, rawValue.value._nanoseconds);
+          }
+          break;
+        case 'geopoint':
+          rawValue = rawValue as IGeopoint;
+          rawValue = new admin.firestore.GeoPoint(rawValue.value._latitude, rawValue.value._longitude);
+          break;
+        case 'documentReference':
+          rawValue = rawValue as IDocumentReference;
+          rawValue = admin.firestore().doc(rawValue.value);
+          break;
       }
-    } else if(typeof rawValue === 'boolean') {
-      cleanedValue = rawValue;
-    } else if(typeof rawValue === 'string') {
-      cleanedValue = rawValue;
-    } else if(typeof rawValue === 'number') {
-      cleanedValue = rawValue;
-    } else { //still does not handle Maps
-      console.error("UNKNOWN TYPE: " + rawValue);
-      throw new Error("UNKNOWN TYPE: " + rawValue + ", possibly a Map or some new type added to Firestore?");
+    } else {
+      let cleaned: any = {};
+      Object.keys(rawValue).map((key: string) => cleaned[key] = unserializeSpecialTypes(data[key]));
+      rawValue = cleaned;
     }
-    cleaned[key] = cleanedValue;
-  });
-  return cleaned;
-};
+    return rawValue;
+  }
+}
+
+const isScalar = (val: any) => (typeof val === 'string' || val instanceof String)
+  || (typeof val === 'number' && isFinite(val))
+  || (val === null)
+  || (typeof val === 'boolean')
 
 export {array_chunks, serializeSpecialTypes, unserializeSpecialTypes};
