@@ -1,5 +1,5 @@
 # node-firestore-import-export
-Firestore data importing and exporting tool.
+Firestore data importing, exporting, and data clearing tool.
 
 [![codebeat badge](https://codebeat.co/badges/c7db349c-8de5-4b49-b366-55a0448eb18a)](https://codebeat.co/projects/github-com-jloosli-node-firestore-import-export-master)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/578282c87d824a1e9aa650cdcadcdd31)](https://www.codacy.com/app/jloosli/node-firestore-import-export?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jloosli/node-firestore-import-export&amp;utm_campaign=Badge_Grade)
