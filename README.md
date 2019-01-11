@@ -274,3 +274,8 @@ Feel free to report bugs and make feature requests in the [Issue Tracker](https:
 
 ### Inspiration
 The command line was inspired heavily by SteadyEquipment's [node-firestore-backup](https://github.com/steadyequipment/node-firestore-backup) 
+
+## Support on Beerpay
+Hey dude! Help me out for a couple of :beers:!
+
+[![Beerpay](https://beerpay.io/jloosli/node-firestore-import-export/badge.svg?style=beer-square)](https://beerpay.io/jloosli/node-firestore-import-export)  [![Beerpay](https://beerpay.io/jloosli/node-firestore-import-export/make-wish.svg?style=flat-square)](https://beerpay.io/jloosli/node-firestore-import-export?focus=wish)
