@@ -21,6 +21,7 @@
   "scripts": {
     "export": "node ./dist/bin/firestore-export.js",
     "import": "node ./dist/bin/firestore-import.js",
+    "clear": "node ./dist/bin/firestore-clear.js",
     "build": "npm run tests && npm run clean && tsc",
     "watch": "tsc -w",
     "clean": "node ./src/bin/clean.js",
@@ -28,7 +29,8 @@
   },
   "bin": {
     "firestore-export": "./dist/bin/firestore-export.js",
-    "firestore-import": "./dist/bin/firestore-import.js"
+    "firestore-import": "./dist/bin/firestore-import.js",
+    "firestore-clear": "./dist/bin/firestore-clear.js"
   },
   "engines": {
     "node": ">=8.0"
