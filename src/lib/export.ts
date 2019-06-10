@@ -1,4 +1,4 @@
-import {isLikeDocument, isRootOfDatabase, sleep} from './firestore-helpers';
+import {batchExecutor, isLikeDocument, isRootOfDatabase, sleep} from './firestore-helpers';
 import * as admin from 'firebase-admin';
 import {serializeSpecialTypes} from './helpers';
 
@@ -17,7 +17,7 @@ const exportData = async (startingRef: admin.firestore.Firestore |
         .then(snapshot => snapshot.data())
         .then(data => serializeSpecialTypes(data));
     }
-    return await Promise.all([collectionsPromise, dataPromise]).then(res => {
+    return await batchExecutor([collectionsPromise, dataPromise]).then(res => {
       return {'__collections__': res[0], ...res[1]};
     });
   } else {
@@ -48,7 +48,7 @@ const getCollections = async (startingRef: admin.firestore.Firestore | FirebaseF
     collectionNames.push(collectionRef.id);
     collectionPromises.push(getDocuments(collectionRef));
   });
-  const results = await Promise.all(collectionPromises);
+  const results = await batchExecutor(collectionPromises);
   const zipped: any = {};
   results.map((res: any, idx: number) => {
     zipped[collectionNames[idx]] = res;
@@ -83,7 +83,7 @@ const getDocuments = async (collectionRef: FirebaseFirestore.CollectionReference
       resolve(docDetails);
     }));
   });
-  (await Promise.all(documentPromises))
+  (await batchExecutor(documentPromises))
     .map((res: any) => {
       Object.keys(res).map(key => (<any>results)[key] = res[key]);
     });

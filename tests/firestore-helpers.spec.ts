@@ -1,6 +1,7 @@
 import 'mocha';
 import {expect} from 'chai';
 import {
+  batchExecutor,
   getCredentialsFromFile,
   getDBReferenceFromPath,
   isLikeDocument,
@@ -71,7 +72,6 @@ describe('Firestore Helpers', () => {
         })
     });
 
-
     describe('getDBReferenceFromPath()', () => {
         it('should create a document reference with the requested path', () => {
             const mockFirestore = new firebasemock.MockFirestore();
@@ -88,4 +88,26 @@ describe('Firestore Helpers', () => {
         });
     });
 
+    describe('batchExecutor', () => {
+
+      const toPromise = async function(x: any) {return x;};
+
+      it('should resolve lists smaller then the batchsize', async () => {
+        const input = [toPromise(1), toPromise(2)];
+        let actual = await batchExecutor(input, 3);
+        expect(actual).to.eql([1,2]);
+      });
+
+      it('should resolve lists equal to the batchsize', async () => {
+        const input = [toPromise(1), toPromise(2)];
+        let actual = await batchExecutor(input, 1);
+        expect(actual).to.eql([1,2]);
+      });
+
+      it('should resolve lists larger then the batchsize', async () => {
+        const input = [toPromise(1), toPromise(2)];
+        let actual = await batchExecutor(input, 1);
+        expect(actual).to.eql([1,2]);
+      });
+    });
 });
