@@ -58,6 +58,6 @@
     "firebase-mock": "^2.2.10",
     "mocha": "^6.1.4",
     "ts-node": "^8.2.0",
-    "typescript": "^3.1.6"
+    "typescript": "^3.5.1"
   }
 }
