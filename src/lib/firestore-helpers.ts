@@ -44,6 +44,19 @@ const isRootOfDatabase = (ref: admin.firestore.Firestore |
 
 const sleep = (timeInMS: number): Promise<void> => new Promise(resolve => setTimeout(resolve, timeInMS));
 
+const batchExecutor = async function<T>(promises: Promise<T>[], batchSize: number = 50) {
+  const res: T[] = [];
+  while (promises.length > batchSize) {
+    const temp = await Promise.all(promises.splice(0, batchSize));
+    res.push(...temp)
+  }
+  if (promises.length > 0) {
+    const temp = await Promise.all(promises);
+    res.push(...temp)
+  }
+  return res;
+};
+
 export {
   getCredentialsFromFile,
   getFirestoreDBReference,
@@ -51,4 +64,5 @@ export {
   isLikeDocument,
   isRootOfDatabase,
   sleep,
+  batchExecutor
 };

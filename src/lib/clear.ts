@@ -1,4 +1,4 @@
-import {isLikeDocument, isRootOfDatabase, sleep} from './firestore-helpers';
+import {batchExecutor, isLikeDocument, isRootOfDatabase, sleep} from './firestore-helpers';
 import * as admin from 'firebase-admin';
 import DocumentReference = FirebaseFirestore.DocumentReference;
 
@@ -39,7 +39,7 @@ const clearCollections = async (startingRef: admin.firestore.Firestore | Firebas
   collectionsSnapshot.map((collectionRef: FirebaseFirestore.CollectionReference) => {
     collectionPromises.push(clearDocuments(collectionRef));
   });
-  return Promise.all(collectionPromises);
+  return batchExecutor(collectionPromises);
 };
 
 const clearDocuments = async (collectionRef: FirebaseFirestore.CollectionReference) => {
@@ -64,7 +64,7 @@ const clearDocuments = async (collectionRef: FirebaseFirestore.CollectionReferen
     documentPromises.push(clearCollections(docRef));
     documentPromises.push(docRef.delete());
   });
-  return Promise.all(documentPromises);
+  return batchExecutor(documentPromises);
 };
 
 export default clearData;
