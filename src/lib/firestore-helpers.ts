@@ -46,12 +46,8 @@ const sleep = (timeInMS: number): Promise<void> => new Promise(resolve => setTim
 
 const batchExecutor = async function<T>(promises: Promise<T>[], batchSize: number = 50) {
   const res: T[] = [];
-  while (promises.length > batchSize) {
+  while (promises.length > 0) {
     const temp = await Promise.all(promises.splice(0, batchSize));
-    res.push(...temp)
-  }
-  if (promises.length > 0) {
-    const temp = await Promise.all(promises);
     res.push(...temp)
   }
   return res;
