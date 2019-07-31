@@ -261,9 +261,9 @@
     "@types/node" "*"
 
 "@types/core-js@^2.5.0":
-  version "2.5.1"
-  resolved "https://registry.yarnpkg.com/@types/core-js/-/core-js-2.5.1.tgz#1dfdd0baee6d324063bc7b722e998e3d6f1a9e44"
-  integrity sha512-tLLO/1rpV5tEC9AJInGPXecI9+eGWT30GdCBPS2Drt0aU2LrrbulBhVPHKIPo0tgHF4RiXasM+M11UhbA20IRA==
+  version "2.5.2"
+  resolved "https://registry.yarnpkg.com/@types/core-js/-/core-js-2.5.2.tgz#d4c25420044d4a5b65e00a82fc04b7824b62691f"
+  integrity sha512-+NPqjXgyA02xTHKJDeDca9u8Zr42ts6jhdND4C3PrPeQ35RJa0dmfAedXW7a9K4N1QcBbuWI1nSfGK4r1eVFCQ==
 
 "@types/cors@^2.8.1":
   version "2.8.5"
