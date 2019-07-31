@@ -29,7 +29,7 @@ const getCollections = async (startingRef: admin.firestore.Firestore | FirebaseF
   let collectionsSnapshot, deadlineError = false;
   do {
     try {
-      collectionsSnapshot = await startingRef.getCollections();
+      collectionsSnapshot = await startingRef.listCollections();
       deadlineError = false;
     } catch (e) {
       if (e.message === 'Deadline Exceeded') {
