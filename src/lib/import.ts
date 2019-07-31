@@ -1,5 +1,5 @@
 import * as admin from 'firebase-admin';
-import {isLikeDocument, isRootOfDatabase} from './firestore-helpers';
+import {batchExecutor, isLikeDocument, isRootOfDatabase} from './firestore-helpers';
 import {array_chunks, unserializeSpecialTypes} from './helpers';
 import {ICollection} from '../interfaces/ICollection';
 
@@ -23,13 +23,13 @@ const importData = (data: any,
       }
     }
     if (isRootOfDatabase(startingRef)) {
-      return Promise.all(collectionPromises);
+      return batchExecutor(collectionPromises);
     } else {
       const documentID = startingRef.id;
       const documentData: any = {};
       documentData[documentID] = dataToImport;
       const documentPromise = setDocuments(documentData, startingRef.parent, mergeWithExisting);
-      return documentPromise.then(() => Promise.all(collectionPromises));
+      return documentPromise.then(() => batchExecutor(collectionPromises));
     }
   } else {
     return setDocuments(dataToImport, <FirebaseFirestore.CollectionReference>startingRef, mergeWithExisting);
@@ -61,13 +61,13 @@ const setDocuments = (data: ICollection, startingRef: FirebaseFirestore.Collecti
     });
     return batch.commit();
   });
-  return Promise.all(chunkPromises)
+  return batchExecutor(chunkPromises)
     .then(() => {
       return collections.map((col) => {
         return setDocuments(col.collection, col.path, mergeWithExisting);
       });
     })
-    .then(subCollectionPromises => Promise.all(subCollectionPromises))
+    .then(subCollectionPromises => batchExecutor(subCollectionPromises))
     .catch(err => {
       console.log(err);
 
