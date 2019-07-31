@@ -61,7 +61,7 @@ const getDocuments = async (collectionRef: FirebaseFirestore.CollectionReference
   let allDocuments, deadlineError = false;
   do {
     try {
-      allDocuments = await collectionRef.get();
+      allDocuments = await collectionRef.listDocuments();
       deadlineError = false;
     } catch (e) {
       if (e.code && e.code === 4) {
@@ -75,10 +75,15 @@ const getDocuments = async (collectionRef: FirebaseFirestore.CollectionReference
   } while (deadlineError || !allDocuments);
   const results: any = {};
   const documentPromises: Array<Promise<object>> = [];
-  allDocuments.forEach((docSnapshot) => {
+  allDocuments.forEach((doc) => {
     documentPromises.push(new Promise(async (resolve) => {
+      const docSnapshot = await doc.get();
       const docDetails: any = {};
-      docDetails[docSnapshot.id] = serializeSpecialTypes(docSnapshot.data());
+      if (docSnapshot.exists) {
+        docDetails[docSnapshot.id] = serializeSpecialTypes(docSnapshot.data());
+      } else {
+        docDetails[docSnapshot.id] = {};
+      }
       docDetails[docSnapshot.id]['__collections__'] = await getCollections(docSnapshot.ref);
       resolve(docDetails);
     }));
