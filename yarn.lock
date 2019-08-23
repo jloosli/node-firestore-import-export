@@ -63,9 +63,9 @@
     teeny-request "^4.0.0"
 
 "@google-cloud/firestore@^2.0.0", "@google-cloud/firestore@^2.2.0":
-  version "2.2.6"
-  resolved "https://registry.yarnpkg.com/@google-cloud/firestore/-/firestore-2.2.6.tgz#99aeee181e6dfcf2d0dbe2f8778035544dff14ae"
-  integrity sha512-Ji4aOGQKtJwdaFKnNXL6nNoBfyzUTosFi1DgIM+IXd3JeBjMItou8zmLXh0teH9iL1I3lzeNd8doY3S7S7nWNg==
+  version "2.2.8"
+  resolved "https://registry.yarnpkg.com/@google-cloud/firestore/-/firestore-2.2.8.tgz#99d859690acda9d0094dca09b05efed32ac1d921"
+  integrity sha512-838nh/3Eyv3GB1TSIwWJaOLTDjQZ5mNm3PzgkNZA31GHK91GE4mziYsH05FQJ9FkCbn2TSEhXFihufs5hqBPOg==
   dependencies:
     bun "^0.0.12"
     deep-equal "^1.0.1"
