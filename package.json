@@ -46,8 +46,7 @@
     "firebase-admin": "^8.3.0",
     "firebase-functions": "^3.2.0",
     "load-json-file": "^6.2.0",
-    "prompt": "^1.0.0",
-    "snyk": "^1.189.0"
+    "prompt": "^1.0.0"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
@@ -59,6 +58,7 @@
     "del": "^5.0.0",
     "firebase-mock": "^2.2.10",
     "mocha": "^6.0.2",
+    "snyk": "^1.189.0",
     "ts-node": "^8.0.2",
     "typescript": "^3.1.6"
   },
