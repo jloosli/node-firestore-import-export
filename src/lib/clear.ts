@@ -23,10 +23,10 @@ const clearData = async (startingRef: admin.firestore.Firestore |
 };
 
 const clearCollections = async (startingRef: admin.firestore.Firestore | FirebaseFirestore.DocumentReference, logs = false) => {
-  const collectionPromises: Array<Promise<any>> = [];
+  const collectionPromises: Array<() => Promise<any>> = [];
   const collectionsSnapshot = await safelyGetCollectionsSnapshot(startingRef, logs);
   collectionsSnapshot.map((collectionRef: FirebaseFirestore.CollectionReference) => {
-    collectionPromises.push(clearDocuments(collectionRef, logs));
+    collectionPromises.push(() => clearDocuments(collectionRef, logs));
   });
   return batchExecutor(collectionPromises);
 };
@@ -34,10 +34,10 @@ const clearCollections = async (startingRef: admin.firestore.Firestore | Firebas
 const clearDocuments = async (collectionRef: FirebaseFirestore.CollectionReference, logs = false) => {
   logs && console.log(`Retrieving documents from ${collectionRef.path}`);
   const allDocuments = await safelyGetDocumentReferences(collectionRef, logs);
-  const documentPromises: Array<Promise<object>> = [];
+  const documentPromises: Array<() => Promise<object>> = [];
   allDocuments.forEach((docRef: DocumentReference) => {
-    documentPromises.push(clearCollections(docRef, logs));
-    documentPromises.push(docRef.delete());
+    documentPromises.push(() => clearCollections(docRef, logs));
+    documentPromises.push(() => docRef.delete());
   });
   return batchExecutor(documentPromises);
 };

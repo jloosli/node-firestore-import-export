@@ -12,12 +12,12 @@ const exportData = async (startingRef: admin.firestore.Firestore |
   FirebaseFirestore.DocumentReference |
   FirebaseFirestore.CollectionReference, logs = false) => {
   if (isLikeDocument(startingRef)) {
-    const collectionsPromise = getCollections(startingRef, logs);
-    let dataPromise: Promise<any>;
+    const collectionsPromise = () => getCollections(startingRef, logs);
+    let dataPromise: () => Promise<any>;
     if (isRootOfDatabase(startingRef)) {
-      dataPromise = Promise.resolve({});
+      dataPromise = () => Promise.resolve({});
     } else {
-      dataPromise = (<FirebaseFirestore.DocumentReference>startingRef).get()
+      dataPromise = () => (<FirebaseFirestore.DocumentReference>startingRef).get()
         .then(snapshot => snapshot.data())
         .then(data => serializeSpecialTypes(data));
     }
@@ -31,11 +31,11 @@ const exportData = async (startingRef: admin.firestore.Firestore |
 
 const getCollections = async (startingRef: admin.firestore.Firestore | FirebaseFirestore.DocumentReference, logs = false) => {
   const collectionNames: Array<string> = [];
-  const collectionPromises: Array<Promise<any>> = [];
+  const collectionPromises: Array<() => Promise<any>> = [];
   const collectionsSnapshot = await safelyGetCollectionsSnapshot(startingRef, logs);
   collectionsSnapshot.map((collectionRef: FirebaseFirestore.CollectionReference) => {
     collectionNames.push(collectionRef.id);
-    collectionPromises.push(getDocuments(collectionRef, logs));
+    collectionPromises.push(() => getDocuments(collectionRef, logs));
   });
   const results = await batchExecutor(collectionPromises);
   const zipped: any = {};
@@ -48,11 +48,11 @@ const getCollections = async (startingRef: admin.firestore.Firestore | FirebaseF
 const getDocuments = async (collectionRef: FirebaseFirestore.CollectionReference, logs = false) => {
   logs && console.log(`Retrieving documents from ${collectionRef.path}`);
   const results: any = {};
-  const documentPromises: Array<Promise<object>> = [];
+  const documentPromises: Array<() => Promise<object>> = [];
   const allDocuments = await safelyGetDocumentReferences(collectionRef, logs);
   allDocuments.forEach((doc) => {
 
-    documentPromises.push(new Promise(async (resolve) => {
+    documentPromises.push(() => new Promise(async (resolve) => {
       const docSnapshot = await doc.get();
       const docDetails: any = {};
       if (docSnapshot.exists) {
