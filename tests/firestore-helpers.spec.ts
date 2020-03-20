@@ -21,7 +21,7 @@ describe('Firestore Helpers', () => {
             const start = Date.now();
             await sleep(timeToSleep);
             const end = Date.now();
-            expect(end).to.be.above(start + timeToSleep);
+            expect(end).to.be.at.least(start + timeToSleep);
         });
     });
 
