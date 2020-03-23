@@ -441,10 +441,10 @@
     "@types/node" "*"
     "@types/range-parser" "*"
 
-"@types/express@^4.17.0":
-  version "4.17.2"
-  resolved "https://registry.yarnpkg.com/@types/express/-/express-4.17.2.tgz#a0fb7a23d8855bac31bc01d5a58cadd9b2173e6c"
-  integrity sha512-5mHFNyavtLoJmnusB8OKJ5bshSzw+qkMIBAobLrIM48HJvunFva9mOa6aBwh64lBFyNwBbs0xiEFuj4eU/NjCA==
+"@types/express@^4.17.3":
+  version "4.17.3"
+  resolved "https://registry.yarnpkg.com/@types/express/-/express-4.17.3.tgz#38e4458ce2067873b09a73908df488870c303bd9"
+  integrity sha512-I8cGRJj3pyOLs/HndoP+25vOqhqWkAZsWMEmq1qXy/b/M3ppufecUwaK2/TVDVxcV61/iSdhykUjQQ2DLSrTdg==
   dependencies:
     "@types/body-parser" "*"
     "@types/express-serve-static-core" "*"
@@ -1601,11 +1601,11 @@ firebase-auto-ids@~1.1.0:
   integrity sha1-N4/7hZCIjDfrLdi3BGWa0PSfkGE=
 
 firebase-functions@^3.2.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/firebase-functions/-/firebase-functions-3.3.0.tgz#8c6d909eebfa4bce1b25a2e34edfc52cc786a020"
-  integrity sha512-dP6PCG+OwR6RtFpOqwPsLnfiCr3CwXAm/SVGMbO53vDAk0nhUQ1WGAyHDYmIyMAkaLJkIKGwDnX7XmZ5+yAg7g==
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/firebase-functions/-/firebase-functions-3.5.0.tgz#c42accc7a965b03b00a69d230ff06eeaff9e6fe2"
+  integrity sha512-BnhfsMyhi2eQfKO6RlOKg7bidiIzTrKY+7qF3M02c5yCczUaSQN3TvggqxphaZPOdEdPF2OjoBBK9xO2R2RHeg==
   dependencies:
-    "@types/express" "^4.17.0"
+    "@types/express" "^4.17.3"
     cors "^2.8.5"
     express "^4.17.1"
     jsonwebtoken "^8.5.1"
