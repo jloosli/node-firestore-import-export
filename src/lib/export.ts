@@ -1,14 +1,18 @@
-import {batchExecutor, isLikeDocument, isRootOfDatabase, sleep} from './firestore-helpers';
+import {
+  batchExecutor,
+  isLikeDocument,
+  isRootOfDatabase,
+  safelyGetCollectionsSnapshot,
+  safelyGetDocumentReferences,
+} from './firestore-helpers';
 import * as admin from 'firebase-admin';
 import {serializeSpecialTypes} from './helpers';
 
-const SLEEP_TIME = 1000;
-
 const exportData = async (startingRef: admin.firestore.Firestore |
   FirebaseFirestore.DocumentReference |
-  FirebaseFirestore.CollectionReference) => {
+  FirebaseFirestore.CollectionReference, logs = false) => {
   if (isLikeDocument(startingRef)) {
-    const collectionsPromise = getCollections(startingRef);
+    const collectionsPromise = getCollections(startingRef, logs);
     let dataPromise: Promise<any>;
     if (isRootOfDatabase(startingRef)) {
       dataPromise = Promise.resolve({});
@@ -21,32 +25,17 @@ const exportData = async (startingRef: admin.firestore.Firestore |
       return {'__collections__': res[0], ...res[1]};
     });
   } else {
-    return await getDocuments(<FirebaseFirestore.CollectionReference>startingRef);
+    return await getDocuments(<FirebaseFirestore.CollectionReference>startingRef, logs);
   }
 };
 
-const getCollections = async (startingRef: admin.firestore.Firestore | FirebaseFirestore.DocumentReference) => {
-  let collectionsSnapshot, deadlineError = false;
-  do {
-    try {
-      collectionsSnapshot = await startingRef.listCollections();
-      deadlineError = false;
-    } catch (e) {
-      if (e.message === 'Deadline Exceeded') {
-        console.log(`Deadline Error in getCollections()...waiting ${SLEEP_TIME / 1000} second(s) before retrying`);
-        await sleep(SLEEP_TIME);
-        deadlineError = true;
-      } else {
-        throw e;
-      }
-    }
-  } while (deadlineError || !collectionsSnapshot);
-
+const getCollections = async (startingRef: admin.firestore.Firestore | FirebaseFirestore.DocumentReference, logs = false) => {
   const collectionNames: Array<string> = [];
   const collectionPromises: Array<Promise<any>> = [];
+  const collectionsSnapshot = await safelyGetCollectionsSnapshot(startingRef, logs);
   collectionsSnapshot.map((collectionRef: FirebaseFirestore.CollectionReference) => {
     collectionNames.push(collectionRef.id);
-    collectionPromises.push(getDocuments(collectionRef));
+    collectionPromises.push(getDocuments(collectionRef, logs));
   });
   const results = await batchExecutor(collectionPromises);
   const zipped: any = {};
@@ -56,23 +45,9 @@ const getCollections = async (startingRef: admin.firestore.Firestore | FirebaseF
   return zipped;
 };
 
-const getDocuments = async (collectionRef: FirebaseFirestore.CollectionReference) => {
-  console.log(`Retrieving documents from ${collectionRef.path}`);
-  let allDocuments, deadlineError = false;
-  do {
-    try {
-      allDocuments = await collectionRef.listDocuments();
-      deadlineError = false;
-    } catch (e) {
-      if (e.code && e.code === 4) {
-        console.log(`Deadline Error in getDocuments()...waiting ${SLEEP_TIME / 1000} second(s) before retrying`);
-        await sleep(SLEEP_TIME);
-        deadlineError = true;
-      } else {
-        throw e;
-      }
-    }
-  } while (deadlineError || !allDocuments);
+const getDocuments = async (collectionRef: FirebaseFirestore.CollectionReference, logs = false) => {
+  logs && console.log(`Retrieving documents from ${collectionRef.path}`);
+  const allDocuments = await safelyGetDocumentReferences(collectionRef, logs);
   const results: any = {};
   const documentPromises: Array<Promise<object>> = [];
   allDocuments.forEach((doc) => {
@@ -84,12 +59,12 @@ const getDocuments = async (collectionRef: FirebaseFirestore.CollectionReference
       } else {
         docDetails[docSnapshot.id] = {};
       }
-      docDetails[docSnapshot.id]['__collections__'] = await getCollections(docSnapshot.ref);
+      docDetails[docSnapshot.id]['__collections__'] = await getCollections(docSnapshot.ref, logs);
       resolve(docDetails);
     }));
   });
   (await batchExecutor(documentPromises))
-    .map((res: any) => {
+    .forEach((res: any) => {
       Object.keys(res).map(key => (<any>results)[key] = res[key]);
     });
   return results;

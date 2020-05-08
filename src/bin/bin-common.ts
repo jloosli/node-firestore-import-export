@@ -48,6 +48,9 @@ const commandLineParams: { [param: string]: Params } =
 
 const buildOption = ({shortKey, key, args = '', description}: Params): [string, string] => [`-${shortKey} --${key} ${args}`, description];
 
+/*
+See https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work
+ */
 class ActionAbortedError extends Error {
   constructor(m?: string) {
     super(m);

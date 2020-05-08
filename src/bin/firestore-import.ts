@@ -50,18 +50,13 @@ if (!fs.existsSync(backupFile)) {
 
 const nodePath = commander[params.nodePath.key];
 
-const importPathPromise = getCredentialsFromFile(accountCredentialsPath)
-  .then(credentials => {
-    const db = getFirestoreDBReference(credentials);
-    return getDBReferenceFromPath(db, nodePath);
-  });
-
 const unattendedConfirmation = commander[params.yesToImport.key];
 
 (async () => {
-  const [data, pathReference, credentials] = await Promise.all([
-    loadJsonFile(backupFile), importPathPromise, getCredentialsFromFile(accountCredentialsPath),
-  ]);
+  const credentials = await getCredentialsFromFile(accountCredentialsPath);
+  const db = getFirestoreDBReference(credentials);
+  const pathReference = await getDBReferenceFromPath(db, nodePath);
+  const data = await loadJsonFile(backupFile);
 
   if (!unattendedConfirmation) {
     const nodeLocation = (<FirebaseFirestore.DocumentReference | FirebaseFirestore.CollectionReference>pathReference)
@@ -82,9 +77,9 @@ const unattendedConfirmation = commander[params.yesToImport.key];
     }
 
   }
+
   console.log(colors.bold(colors.green('Starting Import 🏋️')));
-  // @ts-ignore
-  await firestoreImport(data, pathReference);
+  await firestoreImport(data, pathReference, true, true);
   console.log(colors.bold(colors.green('All done 🎉')));
 })().catch((error) => {
   if (error instanceof ActionAbortedError) {

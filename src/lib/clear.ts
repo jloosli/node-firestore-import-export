@@ -1,67 +1,42 @@
-import {batchExecutor, isLikeDocument, isRootOfDatabase, sleep} from './firestore-helpers';
+import {
+  batchExecutor,
+  isLikeDocument,
+  isRootOfDatabase,
+  safelyGetCollectionsSnapshot,
+  safelyGetDocumentReferences,
+} from './firestore-helpers';
 import * as admin from 'firebase-admin';
 import DocumentReference = FirebaseFirestore.DocumentReference;
 
-const SLEEP_TIME = 1000;
-
 const clearData = async (startingRef: admin.firestore.Firestore |
   FirebaseFirestore.DocumentReference |
-  FirebaseFirestore.CollectionReference) => {
+  FirebaseFirestore.CollectionReference, logs = false) => {
   if (isLikeDocument(startingRef)) {
-    const promises = [clearCollections(startingRef)];
+    const promises: Promise<any>[] = [clearCollections(startingRef, logs)];
     if (!isRootOfDatabase(startingRef)) {
       promises.push(startingRef.delete() as Promise<any>);
     }
     return Promise.all(promises);
   } else {
-    return clearDocuments(<FirebaseFirestore.CollectionReference>startingRef);
+    return clearDocuments(<FirebaseFirestore.CollectionReference>startingRef, logs);
   }
 };
 
-const clearCollections = async (startingRef: admin.firestore.Firestore | FirebaseFirestore.DocumentReference) => {
-  let collectionsSnapshot, deadlineError = false;
-  do {
-    try {
-      collectionsSnapshot = await startingRef.listCollections();
-      deadlineError = false;
-    } catch (e) {
-      if (e.message === 'Deadline Exceeded') {
-        console.log(`Deadline Error in getCollections()...waiting ${SLEEP_TIME / 1000} second(s) before retrying`);
-        await sleep(SLEEP_TIME);
-        deadlineError = true;
-      } else {
-        throw e;
-      }
-    }
-  } while (deadlineError || !collectionsSnapshot);
-
+const clearCollections = async (startingRef: admin.firestore.Firestore | FirebaseFirestore.DocumentReference, logs = false) => {
   const collectionPromises: Array<Promise<any>> = [];
+  const collectionsSnapshot = await safelyGetCollectionsSnapshot(startingRef, logs);
   collectionsSnapshot.map((collectionRef: FirebaseFirestore.CollectionReference) => {
-    collectionPromises.push(clearDocuments(collectionRef));
+    collectionPromises.push(clearDocuments(collectionRef, logs));
   });
   return batchExecutor(collectionPromises);
 };
 
-const clearDocuments = async (collectionRef: FirebaseFirestore.CollectionReference) => {
-  console.log(`Retrieving documents from ${collectionRef.path}`);
-  let allDocuments, deadlineError = false;
-  do {
-    try {
-      allDocuments = await collectionRef.listDocuments();
-      deadlineError = false;
-    } catch (e) {
-      if (e.code && e.code === 4) {
-        console.log(`Deadline Error in listDocuments()...waiting ${SLEEP_TIME / 1000} second(s) before retrying`);
-        await sleep(SLEEP_TIME);
-        deadlineError = true;
-      } else {
-        throw e;
-      }
-    }
-  } while (deadlineError || !allDocuments);
+const clearDocuments = async (collectionRef: FirebaseFirestore.CollectionReference, logs = false) => {
+  logs && console.log(`Retrieving documents from ${collectionRef.path}`);
+  const allDocuments = await safelyGetDocumentReferences(collectionRef, logs);
   const documentPromises: Array<Promise<object>> = [];
   allDocuments.forEach((docRef: DocumentReference) => {
-    documentPromises.push(clearCollections(docRef));
+    documentPromises.push(clearCollections(docRef, logs));
     documentPromises.push(docRef.delete());
   });
   return batchExecutor(documentPromises);

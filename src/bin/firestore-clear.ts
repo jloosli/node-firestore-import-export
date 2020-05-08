@@ -58,7 +58,7 @@ const unattendedConfirmation = commander[params.yesToClear.key];
       throw new ActionAbortedError('Clear Aborted');
     }
     console.log(colors.bold(colors.green('Starting clearing of records 🏋️')));
-    await firestoreClear(pathReference);
+    await firestoreClear(pathReference, true);
     console.log(colors.bold(colors.green('All done 🎉')));
   }
 })().catch((error) => {

@@ -54,7 +54,7 @@ const nodePath = commander[params.nodePath.key];
   const db = getFirestoreDBReference(credentials);
   const pathReference = getDBReferenceFromPath(db, nodePath);
   console.log(colors.bold(colors.green('Starting Export 🏋️')));
-  const results = await firestoreExport(pathReference);
+  const results = await firestoreExport(pathReference, true);
   const stringResults = JSON.stringify(results, undefined, prettyPrint ? 2 : undefined);
   await writeResults(stringResults, backupFile);
   console.log(colors.yellow(`Results were saved to ${backupFile}`));
