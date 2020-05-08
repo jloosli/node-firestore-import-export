@@ -192,6 +192,7 @@ firestore-import --accountCredentials path/to/credentials/file.json --backupFile
 * `-n`, `--nodePath` `<path>`- Path to database node to start (e.g. collectionA/docB/collectionC).
 * `-y`, `--yes` - Unattended clear without confirmation (like hitting "y" from the command line). Command will wait 5
   seconds so you can `Ctrl-C` to stop.
+* `-w`, `--noWait` - Combine this with the `--yes` confirmation to not wait 5 seconds
 
 ##### Example
 ###### Clear everything under a specific node

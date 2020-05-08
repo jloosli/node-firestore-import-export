@@ -3,7 +3,7 @@ import commander from 'commander';
 import colors from 'colors';
 import process from 'process';
 import fs from 'fs';
-import {getCredentialsFromFile, getDBReferenceFromPath, getFirestoreDBReference} from '../lib/firestore-helpers';
+import {getCredentialsFromFile, getDBReferenceFromPath, getFirestoreDBReference, sleep} from '../lib/firestore-helpers';
 import {firestoreClear} from '../lib';
 import {prompt} from 'enquirer';
 import {
@@ -19,6 +19,7 @@ commander.version(packageInfo.version)
   .option(...buildOption(params.accountCredentialsPath))
   .option(...buildOption(params.nodePath))
   .option(...buildOption(params.yesToClear))
+  .option(...buildOption(params.yesToNoWait))
   .parse(process.argv);
 
 const accountCredentialsPath = commander[params.accountCredentialsPath.key] || process.env[accountCredentialsEnvironmentKey];
@@ -37,6 +38,7 @@ if (!fs.existsSync(accountCredentialsPath)) {
 const nodePath = commander[params.nodePath.key];
 
 const unattendedConfirmation = commander[params.yesToClear.key];
+const noWait = commander[params.yesToNoWait.key];
 
 (async () => {
   const credentials = await getCredentialsFromFile(accountCredentialsPath);
@@ -57,10 +59,13 @@ const unattendedConfirmation = commander[params.yesToClear.key];
     if (!response.continue) {
       throw new ActionAbortedError('Clear Aborted');
     }
-    console.log(colors.bold(colors.green('Starting clearing of records 🏋️')));
-    await firestoreClear(pathReference, true);
-    console.log(colors.bold(colors.green('All done 🎉')));
+  } else if (!noWait) {
+    console.log(colors.bgYellow(colors.blue(' === Warning: Deletion will start in 5 seconds. Hit Ctrl-C to cancel. === ')));
+    await sleep(5000);
   }
+  console.log(colors.bold(colors.green('Starting clearing of records 🏋️')));
+  await firestoreClear(pathReference, true);
+  console.log(colors.bold(colors.green('All done 🎉')));
 })().catch((error) => {
   if (error instanceof ActionAbortedError) {
     console.log(error.message);

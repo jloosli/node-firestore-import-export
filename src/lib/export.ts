@@ -47,10 +47,11 @@ const getCollections = async (startingRef: admin.firestore.Firestore | FirebaseF
 
 const getDocuments = async (collectionRef: FirebaseFirestore.CollectionReference, logs = false) => {
   logs && console.log(`Retrieving documents from ${collectionRef.path}`);
-  const allDocuments = await safelyGetDocumentReferences(collectionRef, logs);
   const results: any = {};
   const documentPromises: Array<Promise<object>> = [];
+  const allDocuments = await safelyGetDocumentReferences(collectionRef, logs);
   allDocuments.forEach((doc) => {
+
     documentPromises.push(new Promise(async (resolve) => {
       const docSnapshot = await doc.get();
       const docDetails: any = {};

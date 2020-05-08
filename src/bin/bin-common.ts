@@ -39,6 +39,11 @@ const commandLineParams: { [param: string]: Params } =
       key: 'yes',
       description: 'Unattended clear without confirmation (like hitting "y" from the command line).',
     },
+    yesToNoWait: {
+      shortKey: 'w',
+      key: 'noWait',
+      description: 'Use with unattended confirmation to remove the 5 second delay.',
+    },
     prettyPrint: {
       shortKey: 'p',
       key: 'prettyPrint',
