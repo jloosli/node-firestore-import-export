@@ -69,5 +69,11 @@ describe('Firestore Import', () => {
         expect(true).to.be.true;
       }
     }
-  })
+  });
+
+  it(`should not manipulate imported data object`, async () => {
+    const dump = {name: 'Alice', __collections__: {jobs: {123: {name: 'doctor'}}}};
+    await firestoreImport({['id1']: dump}, mockFirestore.collection('user'));
+    expect(dump.__collections__.jobs['123'].name).to.eql('doctor');
+  });
 });

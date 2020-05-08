@@ -14,7 +14,6 @@ const importData = (data: any,
       throw new Error('Root or document reference doesn\'t contain a __collections__ property.');
     }
     const collections = dataToImport['__collections__'];
-    delete (dataToImport['__collections__']);
     const collectionPromises: Array<Promise<any>> = [];
     for (const collection in collections) {
       if (collections.hasOwnProperty(collection)) {
@@ -53,9 +52,9 @@ const setDocuments = (data: ICollection, startingRef: FirebaseFirestore.Collecti
             collection: data[documentKey]['__collections__'][collection],
           });
         });
-        delete (data[documentKey]['__collections__']);
       }
-      const documentData: any = unserializeSpecialTypes(data[documentKey]);
+      const {__collections__, ...documents} = data[documentKey];
+      const documentData: any = unserializeSpecialTypes(documents);
       batch.set(startingRef.doc(documentKey), documentData, {merge: mergeWithExisting});
     });
     return batch.commit();
