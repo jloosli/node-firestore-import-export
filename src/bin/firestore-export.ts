@@ -1,40 +1,22 @@
 #!/usr/bin/env node
-import * as commander from 'commander';
-import * as colors from 'colors';
-import * as process from 'process';
-import * as fs from 'fs';
+import commander from 'commander';
+import colors from 'colors';
+import process from 'process';
+import fs from 'fs';
 import {firestoreExport} from '../lib';
 import {getCredentialsFromFile, getDBReferenceFromPath, getFirestoreDBReference} from '../lib/firestore-helpers';
-
-const packageInfo = require('../../package.json');
-
-const accountCredentialsEnvironmentKey = 'GOOGLE_APPLICATION_CREDENTIALS';
-const accountCredentialsPathParamKey = 'accountCredentials';
-const accountCredentialsPathParamDescription = 'path to Google Cloud account credentials JSON file. If missing, will look ' +
-  `at the ${accountCredentialsEnvironmentKey} environment variable for the path.`;
-
-const defaultBackupFilename = 'firebase-export.json';
-const backupFileParamKey = 'backupFile';
-const backupFileParamDescription = `Filename to store backup. (e.g. backups/full-backup.json). ` +
-  `Defaults to '${defaultBackupFilename}' if missing.`;
-
-const nodePathParamKey = 'nodePath';
-const nodePathParamDescription = 'Path to database node to start (e.g. collectionA/docB/collectionC). ' +
-  'Backs up entire database from the root if missing.';
-
-const prettyPrintParamKey = 'prettyPrint';
-const prettyPrintParamDescription = 'JSON backups done with pretty-printing.';
+import {accountCredentialsEnvironmentKey, buildOption, commandLineParams as params, packageInfo} from './bin-common';
 
 commander.version(packageInfo.version)
-  .option(`-a, --${accountCredentialsPathParamKey} <path>`, accountCredentialsPathParamDescription)
-  .option(`-b, --${backupFileParamKey} <path>`, backupFileParamDescription)
-  .option(`-n, --${nodePathParamKey} <path>`, nodePathParamDescription)
-  .option(`-p, --${prettyPrintParamKey}`, prettyPrintParamDescription)
+  .option(...buildOption(params.accountCredentialsPath))
+  .option(...buildOption(params.backupFileExport))
+  .option(...buildOption(params.nodePath))
+  .option(...buildOption(params.prettyPrint))
   .parse(process.argv);
 
-const accountCredentialsPath = commander[accountCredentialsPathParamKey] || process.env[accountCredentialsEnvironmentKey];
+const accountCredentialsPath = commander[params.accountCredentialsPath.key] || process.env[accountCredentialsEnvironmentKey];
 if (!accountCredentialsPath) {
-  console.log(colors.bold(colors.red('Missing: ')) + colors.bold(accountCredentialsPathParamKey) + ' - ' + accountCredentialsPathParamDescription);
+  console.log(colors.bold(colors.red('Missing: ')) + colors.bold(params.accountCredentialsPath.key) + ' - ' + params.accountCredentialsPath.description);
   commander.help();
   process.exit(1);
 }
@@ -45,9 +27,9 @@ if (!fs.existsSync(accountCredentialsPath)) {
   process.exit(1);
 }
 
-const backupPath = commander[backupFileParamKey] || defaultBackupFilename;
-if (!backupPath) {
-  console.log(colors.bold(colors.red('Missing: ')) + colors.bold(backupFileParamKey) + ' - ' + backupFileParamDescription);
+const backupFile = commander[params.backupFileExport.key];
+if (!backupFile) {
+  console.log(colors.bold(colors.red('Missing: ')) + colors.bold(params.backupFileExport.key) + ' - ' + params.backupFileExport.description);
   commander.help();
   process.exit(1);
 }
@@ -64,39 +46,27 @@ const writeResults = (results: string, filename: string): Promise<string> => {
   });
 };
 
-const prettyPrint = commander[prettyPrintParamKey] !== undefined && commander[prettyPrintParamKey] !== null;
-const nodePath = commander[nodePathParamKey];
-getCredentialsFromFile(accountCredentialsPath)
-  .then(credentials => {
-    const db = getFirestoreDBReference(credentials);
-    const pathReference = getDBReferenceFromPath(db, nodePath);
-    return pathReference;
-  })
-  .then(pathReference => firestoreExport(pathReference))
-  .then(results => {
-    let stringResults;
-    if (prettyPrint) {
-      stringResults = JSON.stringify(results, null, 2);
-    } else {
-      stringResults = JSON.stringify(results);
-    }
-    return stringResults;
-  })
-  .then((dataToWrite: string) => writeResults(dataToWrite, backupPath))
-  .then((filename: string) => {
-    console.log(colors.yellow(`Results were saved to ${filename}`));
-    return;
-  })
-  .then(() => {
-    console.log(colors.bold(colors.green('All done 🎉')));
-  })
-  .catch((error) => {
-    if (error instanceof Error) {
-      console.log(colors.red(error.message));
-      process.exit(1);
-    } else {
-      console.log(colors.red(error));
-    }
-  });
+const prettyPrint = Boolean(commander[params.prettyPrint.key]);
+const nodePath = commander[params.nodePath.key];
+
+(async () => {
+  const credentials = await getCredentialsFromFile(accountCredentialsPath);
+  const db = getFirestoreDBReference(credentials);
+  const pathReference = getDBReferenceFromPath(db, nodePath);
+  console.log(colors.bold(colors.green('Starting Export 🏋️')));
+  const results = await firestoreExport(pathReference, true);
+  const stringResults = JSON.stringify(results, undefined, prettyPrint ? 2 : undefined);
+  await writeResults(stringResults, backupFile);
+  console.log(colors.yellow(`Results were saved to ${backupFile}`));
+  console.log(colors.bold(colors.green('All done 🎉')));
+})().catch((error) => {
+  if (error instanceof Error) {
+    console.log(colors.red(error.message));
+    process.exit(1);
+  } else {
+    console.log(colors.red(error));
+  }
+});
+
 
 

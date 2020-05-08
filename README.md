@@ -126,6 +126,11 @@ git clone https://github.com/jloosli/node-firestore-import-export.git
 
 This downloaded json file contains the proper credentials needed for __node-firestore-import-export__ to authenticate.
 
+### Using Firebase Firestore Emulator
+
+If using [Firebase Emulators](https://firebase.google.com/docs/rules/emulator-setup), all commands 
+([Export](#export),[Import](#import), and [Clear](#clear)) will override the account credentials 
+setting if the `FIRESTORE_EMULATOR_HOST` environment variable is set.
 
 ## Usage
 
