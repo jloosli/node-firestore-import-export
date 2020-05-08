@@ -1,5 +1,5 @@
 import * as admin from 'firebase-admin';
-import * as loadJsonFile from 'load-json-file';
+import loadJsonFile from 'load-json-file';
 import {IFirebaseCredentials} from '../interfaces/IFirebaseCredentials';
 
 

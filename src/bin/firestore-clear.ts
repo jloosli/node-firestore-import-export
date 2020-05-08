@@ -1,36 +1,29 @@
 #!/usr/bin/env node
-import * as commander from 'commander';
-import * as colors from 'colors';
-import * as process from 'process';
-import * as fs from 'fs';
-import {getCredentialsFromFile, getDBReferenceFromPath, getFirestoreDBReference, sleep} from '../lib/firestore-helpers';
+import commander from 'commander';
+import colors from 'colors';
+import process from 'process';
+import fs from 'fs';
+import {getCredentialsFromFile, getDBReferenceFromPath, getFirestoreDBReference} from '../lib/firestore-helpers';
 import {firestoreClear} from '../lib';
-import * as prompt from 'prompt';
-import * as admin from 'firebase-admin';
+import {prompt} from 'enquirer';
+import {
+  accountCredentialsEnvironmentKey,
+  ActionAbortedError,
+  buildOption,
+  commandLineParams as params,
+  packageInfo,
+} from './bin-common';
 
-const packageInfo = require('../../package.json');
-
-const accountCredentialsEnvironmentKey = 'GOOGLE_APPLICATION_CREDENTIALS';
-const accountCredentialsPathParamKey = 'accountCredentials';
-const accountCredentialsPathParamDescription = 'path to Google Cloud account credentials JSON file. If missing, will look ' +
-  `at the ${accountCredentialsEnvironmentKey} environment variable for the path.`;
-
-const nodePathParamKey = 'nodePath';
-const nodePathParamDescription = 'Path to database node to start (e.g. collectionA/docB/collectionC). ' +
-  'Backs up entire database from the root if missing.';
-
-const yesToClearParamKey = 'yes';
-const yesToClearParamDescription = 'Unattended clear without confirmation (like hitting "y" from the command line).';
 
 commander.version(packageInfo.version)
-  .option(`-a, --${accountCredentialsPathParamKey} <path>`, accountCredentialsPathParamDescription)
-  .option(`-n, --${nodePathParamKey} <path>`, nodePathParamDescription)
-  .option(`-y, --${yesToClearParamKey}`, yesToClearParamDescription)
+  .option(...buildOption(params.accountCredentialsPath))
+  .option(...buildOption(params.nodePath))
+  .option(...buildOption(params.yesToClear))
   .parse(process.argv);
 
-const accountCredentialsPath = commander[accountCredentialsPathParamKey] || process.env[accountCredentialsEnvironmentKey];
+const accountCredentialsPath = commander[params.accountCredentialsPath.key] || process.env[accountCredentialsEnvironmentKey];
 if (!accountCredentialsPath) {
-  console.log(colors.bold(colors.red('Missing: ')) + colors.bold(accountCredentialsPathParamKey) + ' - ' + accountCredentialsPathParamDescription);
+  console.log(colors.bold(colors.red('Missing: ')) + colors.bold(params.accountCredentialsPath.key) + ' - ' + params.accountCredentialsPath.description);
   commander.help();
   process.exit(1);
 }
@@ -41,62 +34,41 @@ if (!fs.existsSync(accountCredentialsPath)) {
   process.exit(1);
 }
 
-const nodePath = commander[nodePathParamKey];
+const nodePath = commander[params.nodePath.key];
 
-const unattendedConfirmation = commander[yesToClearParamKey];
+const unattendedConfirmation = commander[params.yesToClear.key];
 
-getCredentialsFromFile(accountCredentialsPath)
-  .then(credentials => {
-    const db = getFirestoreDBReference(credentials);
-    const pathReference = getDBReferenceFromPath(db, nodePath);
-    return {credentials, pathReference};
-  })
-  .then(async ({credentials, pathReference}): Promise<admin.firestore.Firestore |
-    FirebaseFirestore.DocumentReference |
-    FirebaseFirestore.CollectionReference> => {
-    const nodeLocation = (<FirebaseFirestore.DocumentReference | FirebaseFirestore.CollectionReference>pathReference)
-      .path || '[database root]';
-    const projectID = (credentials as any).project_id;
-    const deleteText = `About to clear all data from '${projectID}' firestore starting at '${nodeLocation}'.`;
-    console.log(`\n\n${colors.bold(colors.blue(deleteText))}`);
-    if (unattendedConfirmation) {
-      console.log(colors.bgYellow(colors.blue(' === Warning: Deletion will start in 5 seconds. Hit Ctrl-C to cancel. === ')));
-      await sleep(5000);
-      return pathReference;
-    }
-
+(async () => {
+  const credentials = await getCredentialsFromFile(accountCredentialsPath);
+  const db = getFirestoreDBReference(credentials);
+  const pathReference = getDBReferenceFromPath(db, nodePath);
+  const nodeLocation = (<FirebaseFirestore.DocumentReference | FirebaseFirestore.CollectionReference>pathReference)
+    .path || '[database root]';
+  const projectID = process.env.FIRESTORE_EMULATOR_HOST || (credentials as any).project_id;
+  const deleteText = `About to clear all data from '${projectID}' firestore starting at '${nodeLocation}'.`;
+  console.log(`\n\n${colors.bold(colors.blue(deleteText))}`);
+  if (!unattendedConfirmation) {
     console.log(colors.bgYellow(colors.blue(' === Warning: This will clear all existing data. Do you want to proceed? === ')));
-    prompt.message = 'firestore-clear';
-    prompt.start();
-    return new Promise((resolve, reject) => {
-      prompt.get({
-        properties: {
-          response: {
-            description: colors.red(`Proceed with clear? [y/N] `),
-          },
-        },
-      }, (err: Error, result: any) => {
-        if (err) {
-          reject(err);
-        } else if (result.response.trim().toLowerCase() !== 'y') {
-          reject('Clear aborted.');
-        } else {
-          resolve(pathReference);
-        }
-      });
+    const response: { continue: boolean } = await prompt({
+      type: 'confirm',
+      name: 'continue',
+      message: 'Proceed with clear?',
     });
-  })
-  .then(pathReference => firestoreClear(pathReference))
-  .then(() => {
-    console.log(colors.bold(colors.green('All done 🎉')));
-  })
-  .catch((error) => {
-    if (error instanceof Error) {
-      console.log(colors.red(error.message));
-      process.exit(1);
-    } else {
-      console.log(colors.red(error));
+    if (!response.continue) {
+      throw new ActionAbortedError('Clear Aborted');
     }
-  });
-
+    console.log(colors.bold(colors.green('Starting clearing of records 🏋️')));
+    await firestoreClear(pathReference);
+    console.log(colors.bold(colors.green('All done 🎉')));
+  }
+})().catch((error) => {
+  if (error instanceof ActionAbortedError) {
+    console.log(error.message);
+  } else if (error instanceof Error) {
+    console.log(colors.red(error.message));
+    process.exit(1);
+  } else {
+    console.log(colors.red(error));
+  }
+});
 
