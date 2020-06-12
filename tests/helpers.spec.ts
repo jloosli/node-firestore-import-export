@@ -92,12 +92,34 @@ describe('Helpers', () => {
     })
   });
 
-  describe('unserializeSpecialTypes', () => {
-    admin.initializeApp();
-    const results = unserializeSpecialTypes(sampleExportedDoc);
-    expect(results.sampleExportedDoc.timestamp).to.be.an.instanceof(admin.firestore.Timestamp);
-    expect(results.sampleExportedDoc.geopoint).to.be.an.instanceof(admin.firestore.GeoPoint);
-    expect(results.sampleExportedDoc.documentRef).to.be.an.instanceof(admin.firestore.DocumentReference);
-    expect(results.sampleExportedDoc.documentRef).to.be.an.instanceof(admin.firestore.DocumentReference);
-  })
+  describe("unserializeSpecialTypes", () => {
+    before(() => {
+      admin.initializeApp();
+    });
+
+    it("should convert exported __datatypes__ back into Firestore primatives", () => {
+      const results = unserializeSpecialTypes(sampleExportedDoc);
+      expect(results.sampleExportedDoc.timestamp).to.be.an.instanceof(
+        admin.firestore.Timestamp
+      );
+      expect(results.sampleExportedDoc.geopoint).to.be.an.instanceof(
+        admin.firestore.GeoPoint
+      );
+      expect(results.sampleExportedDoc.documentRef).to.be.an.instanceof(
+        admin.firestore.DocumentReference
+      );
+    });
+
+    it("should convert parsable date string timestamps", () => {
+      const dateStringTypes = {
+        iso8601: {
+          __datatype__: "timestamp",
+          value: "2020-06-01T04:59:03-07:00"
+        }
+      };
+
+      const results = unserializeSpecialTypes(dateStringTypes);
+      expect(results.iso8601).to.be.an.instanceof(admin.firestore.Timestamp);
+    });
+  });
 });

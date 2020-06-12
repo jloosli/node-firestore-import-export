@@ -63,7 +63,7 @@ const unserializeSpecialTypes = (data: any): any => {
       switch (rawValue.__datatype__) {
         case 'timestamp':
           rawValue = rawValue as ITimestamp;
-          if (rawValue.value instanceof String) {
+          if (typeof rawValue.value === "string") {
             const millis = Date.parse(rawValue.value);
             rawValue = new admin.firestore.Timestamp(millis / 1000, 0);
           } else {
