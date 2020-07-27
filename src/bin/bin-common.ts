@@ -1,3 +1,8 @@
+import process from "process";
+import commander from "commander";
+import colors from "colors";
+import fs from "fs";
+
 const packageInfo = require('../../package.json');
 const accountCredentialsEnvironmentKey = 'GOOGLE_APPLICATION_CREDENTIALS';
 const defaultBackupFilename = 'firebase-export.json';
@@ -63,7 +68,52 @@ class ActionAbortedError extends Error {
   }
 }
 
-export {packageInfo, accountCredentialsEnvironmentKey, commandLineParams, buildOption, ActionAbortedError};
+const checkAccountCredentialsPath = (): string | undefined => {
+  let accountCredentialsPath: string | undefined;
+  if (!process.env.FIRESTORE_EMULATOR_HOST) {
+    accountCredentialsPath = commander[commandLineParams.accountCredentialsPath.key] || process.env[accountCredentialsEnvironmentKey];
+    if (!accountCredentialsPath) {
+      console.log(colors.bold(colors.red('Missing: ')) + colors.bold(commandLineParams.accountCredentialsPath.key) + ' - ' + commandLineParams.accountCredentialsPath.description);
+      commander.help();
+      process.exit(1);
+    }
+
+    if (!fs.existsSync(accountCredentialsPath)) {
+      console.log(colors.bold(colors.red('Account credentials file does not exist: ')) + colors.bold(accountCredentialsPath));
+      commander.help();
+      process.exit(1);
+    }
+  }
+
+  return accountCredentialsPath;
+};
+
+const checkBackupFile = (checkFileExistence = false): string => {
+  const backupFile = commander[commandLineParams.backupFileImport.key];
+  if (!backupFile) {
+    console.log(colors.bold(colors.red('Missing: ')) + colors.bold(commandLineParams.backupFileImport.key) + ' - ' + commandLineParams.backupFileImport.description);
+    commander.help();
+    process.exit(1);
+  }
+
+  if (checkFileExistence && !fs.existsSync(backupFile)) {
+    console.log(colors.bold(colors.red('Backup file does not exist: ')) + colors.bold(backupFile));
+    commander.help();
+    process.exit(1);
+  }
+
+  return backupFile;
+}
+
+export {
+  packageInfo,
+  accountCredentialsEnvironmentKey,
+  commandLineParams,
+  buildOption,
+  ActionAbortedError,
+  checkAccountCredentialsPath,
+  checkBackupFile,
+};
 
 interface Params {
   shortKey: string;

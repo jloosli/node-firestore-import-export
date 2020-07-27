@@ -3,6 +3,7 @@ import {expect} from 'chai';
 import {
   batchExecutor,
   getCredentialsFromFile,
+  getProjectIdFromCredentials,
   getDBReferenceFromPath,
   isLikeDocument,
   isRootOfDatabase,
@@ -64,7 +65,14 @@ describe('Firestore Helpers', () => {
   });
 
   describe('getCredentialsFromFile()', () => {
-    it(`should fail if the file doesn't exist`, async () => {
+    const env = Object.assign({}, process.env);
+
+    it(`should return undefined if using emulator`, async () => {
+      process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080'
+      const credentials = await getCredentialsFromFile();
+      expect(credentials).be.undefined;
+    });
+    it(`should fail if not using emulator and the file doesn't exist`, async () => {
       const dummyFilename = 'i_do_not_exist.json';
       try {
         await getCredentialsFromFile(dummyFilename);
@@ -73,6 +81,29 @@ describe('Firestore Helpers', () => {
         expect(e).to.exist;
       }
     });
+
+    afterEach(() => {
+      process.env = env;
+    })
+  });
+
+  describe('getProjectIdFromCredentials()', () => {
+    const env = Object.assign({}, process.env);
+
+    it(`should get emulator host if using emulator`, async () => {
+      process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080'
+      const projectId = getProjectIdFromCredentials();
+      expect(projectId).to.equal('localhost:8080');
+    });
+
+    it(`should get projectId if not using emulator`, async () => {
+      const projectId = getProjectIdFromCredentials({ project_id: 'testProjectId' });
+      expect(projectId).to.equal('testProjectId');
+    });
+
+    afterEach(() => {
+      process.env = env;
+    })
   });
 
   describe('getDBReferenceFromPath()', () => {
