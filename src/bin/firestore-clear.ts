@@ -2,16 +2,21 @@
 import commander from 'commander';
 import colors from 'colors';
 import process from 'process';
-import fs from 'fs';
-import {getCredentialsFromFile, getDBReferenceFromPath, getFirestoreDBReference, sleep} from '../lib/firestore-helpers';
+import {
+  getCredentialsFromFile,
+  getProjectIdFromCredentials,
+  getFirestoreDBReference,
+  getDBReferenceFromPath,
+  sleep,
+} from '../lib/firestore-helpers';
 import {firestoreClear} from '../lib';
 import {prompt} from 'enquirer';
 import {
-  accountCredentialsEnvironmentKey,
   ActionAbortedError,
   buildOption,
   commandLineParams as params,
   packageInfo,
+  checkAccountCredentialsPath,
 } from './bin-common';
 
 
@@ -22,21 +27,8 @@ commander.version(packageInfo.version)
   .option(...buildOption(params.yesToNoWait))
   .parse(process.argv);
 
-const accountCredentialsPath = commander[params.accountCredentialsPath.key] || process.env[accountCredentialsEnvironmentKey];
-if (!accountCredentialsPath) {
-  console.log(colors.bold(colors.red('Missing: ')) + colors.bold(params.accountCredentialsPath.key) + ' - ' + params.accountCredentialsPath.description);
-  commander.help();
-  process.exit(1);
-}
-
-if (!fs.existsSync(accountCredentialsPath)) {
-  console.log(colors.bold(colors.red('Account credentials file does not exist: ')) + colors.bold(accountCredentialsPath));
-  commander.help();
-  process.exit(1);
-}
-
+const accountCredentialsPath = checkAccountCredentialsPath();
 const nodePath = commander[params.nodePath.key];
-
 const unattendedConfirmation = commander[params.yesToClear.key];
 const noWait = commander[params.yesToNoWait.key];
 
@@ -46,7 +38,7 @@ const noWait = commander[params.yesToNoWait.key];
   const pathReference = getDBReferenceFromPath(db, nodePath);
   const nodeLocation = (<FirebaseFirestore.DocumentReference | FirebaseFirestore.CollectionReference>pathReference)
     .path || '[database root]';
-  const projectID = process.env.FIRESTORE_EMULATOR_HOST || (credentials as any).project_id;
+  const projectID = getProjectIdFromCredentials(credentials);
   const deleteText = `About to clear all data from '${projectID}' firestore starting at '${nodeLocation}'.`;
   console.log(`\n\n${colors.bold(colors.blue(deleteText))}`);
   if (!unattendedConfirmation) {

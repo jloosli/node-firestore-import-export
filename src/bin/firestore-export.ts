@@ -4,8 +4,18 @@ import colors from 'colors';
 import process from 'process';
 import fs from 'fs';
 import {firestoreExport} from '../lib';
-import {getCredentialsFromFile, getDBReferenceFromPath, getFirestoreDBReference} from '../lib/firestore-helpers';
-import {accountCredentialsEnvironmentKey, buildOption, commandLineParams as params, packageInfo} from './bin-common';
+import {
+  getCredentialsFromFile,
+  getDBReferenceFromPath,
+  getFirestoreDBReference
+} from '../lib/firestore-helpers';
+import {
+  buildOption,
+  commandLineParams as params,
+  packageInfo,
+  checkAccountCredentialsPath,
+  checkBackupFile,
+} from './bin-common';
 
 commander.version(packageInfo.version)
   .option(...buildOption(params.accountCredentialsPath))
@@ -14,25 +24,10 @@ commander.version(packageInfo.version)
   .option(...buildOption(params.prettyPrint))
   .parse(process.argv);
 
-const accountCredentialsPath = commander[params.accountCredentialsPath.key] || process.env[accountCredentialsEnvironmentKey];
-if (!accountCredentialsPath) {
-  console.log(colors.bold(colors.red('Missing: ')) + colors.bold(params.accountCredentialsPath.key) + ' - ' + params.accountCredentialsPath.description);
-  commander.help();
-  process.exit(1);
-}
-
-if (!fs.existsSync(accountCredentialsPath)) {
-  console.log(colors.bold(colors.red('Account credentials file does not exist: ')) + colors.bold(accountCredentialsPath));
-  commander.help();
-  process.exit(1);
-}
-
-const backupFile = commander[params.backupFileExport.key];
-if (!backupFile) {
-  console.log(colors.bold(colors.red('Missing: ')) + colors.bold(params.backupFileExport.key) + ' - ' + params.backupFileExport.description);
-  commander.help();
-  process.exit(1);
-}
+const accountCredentialsPath = checkAccountCredentialsPath();
+const backupFile = checkBackupFile();
+const prettyPrint = Boolean(commander[params.prettyPrint.key]);
+const nodePath = commander[params.nodePath.key];
 
 const writeResults = (results: string, filename: string): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -45,9 +40,6 @@ const writeResults = (results: string, filename: string): Promise<string> => {
     });
   });
 };
-
-const prettyPrint = Boolean(commander[params.prettyPrint.key]);
-const nodePath = commander[params.nodePath.key];
 
 (async () => {
   const credentials = await getCredentialsFromFile(accountCredentialsPath);
