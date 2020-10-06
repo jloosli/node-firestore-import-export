@@ -75,7 +75,7 @@ describe('Helpers', () => {
       expect(chunks).to.have.lengthOf(Math.floor(expectedLengthOfChunks));
 
       const lastItem = chunks.pop();
-      expect(lastItem).to.have.lengthOf(expectedRemainder);
+      expect(lastItem).to.have.lengthOf(expectedRemainder || startingArraySize);
     });
   });
 
