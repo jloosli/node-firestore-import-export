@@ -14,10 +14,10 @@ const importData = (data: any,
       throw new Error('Root or document reference doesn\'t contain a __collections__ property.');
     }
     const collections = dataToImport['__collections__'];
-    const collectionPromises: Array<Promise<any>> = [];
+    const collectionPromises: Array<() => Promise<any>> = [];
     for (const collection in collections) {
       if (collections.hasOwnProperty(collection)) {
-        collectionPromises.push(setDocuments(collections[collection], startingRef.collection(collection), mergeWithExisting, logs));
+        collectionPromises.push(() => setDocuments(collections[collection], startingRef.collection(collection), mergeWithExisting, logs));
       }
     }
     if (isRootOfDatabase(startingRef)) {
@@ -57,12 +57,12 @@ const setDocuments = (data: ICollection, startingRef: FirebaseFirestore.Collecti
       const documentData: any = unserializeSpecialTypes(documents);
       batch.set(startingRef.doc(documentKey), documentData, {merge: mergeWithExisting});
     });
-    return batch.commit();
+    return () => batch.commit();
   });
   return batchExecutor(chunkPromises)
     .then(() => {
       return collections.map((col) => {
-        return setDocuments(col.collection, col.path, mergeWithExisting, logs);
+        return () => setDocuments(col.collection, col.path, mergeWithExisting, logs);
       });
     })
     .then(subCollectionPromises => batchExecutor(subCollectionPromises))

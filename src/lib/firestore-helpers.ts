@@ -45,11 +45,11 @@ const isRootOfDatabase = (ref: admin.firestore.Firestore |
 
 const sleep = (timeInMS: number): Promise<void> => new Promise(resolve => setTimeout(resolve, timeInMS));
 
-const batchExecutor = async function <T>(promises: Promise<T>[], batchSize: number = 50) {
+const batchExecutor = async function <T>(promiseGenerators: (() => Promise<T>)[], batchSize: number = 50) {
   const res: T[] = [];
-  while (promises.length > 0) {
-    const temp = await Promise.all(promises.splice(0, batchSize));
-    res.push(...temp);
+  while (promiseGenerators.length > 0) {
+    const promises = promiseGenerators.splice(0, batchSize).map(generator => generator());
+    res.push(...await Promise.all(promises));
   }
   return res;
 };
