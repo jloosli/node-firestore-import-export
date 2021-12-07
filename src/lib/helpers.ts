@@ -93,4 +93,53 @@ const isScalar = (val: any) => (typeof val === 'string' || val instanceof String
   || (val === null)
   || (typeof val === 'boolean');
 
-export {array_chunks, serializeSpecialTypes, unserializeSpecialTypes};
+
+// Reduced and typed version of https://github.com/substack/json-stable-stringify
+const stableStringify = (obj: any, space?: number) => {
+  const spaceString = space ? Array(space+1).join(' ') : '';
+  const seen: any[] = [];
+  return (function stringify (parent: any, node: any, level: number): string {
+    const indent = spaceString ? ('\n' + new Array(level + 1).join(spaceString)) : '';
+    const colonSeparator = spaceString ? ': ' : ':';
+
+    if (node && node.toJSON && typeof node.toJSON === 'function') {
+      node = node.toJSON();
+    }
+
+    if (typeof node !== 'object' || node === null) {
+      return JSON.stringify(node);
+    }
+
+    if (Array.isArray(node)) {
+      const out = node.map(item => {
+        const itemString = stringify(node,  item, level+1) || JSON.stringify(null);
+        return indent + spaceString + itemString
+      })
+      return '[' + out.join(',') + indent + ']';
+    }
+    else {
+      if (seen.indexOf(node) !== -1) {
+        throw new TypeError('Converting circular structure to JSON');
+      }
+      else seen.push(node);
+
+      const keys = Object.keys(node).sort();
+
+      const out = keys.map(key => {
+        const value = stringify(node, node[key], level+1);
+
+        if(!value) return;
+
+        const keyValue = JSON.stringify(key)
+          + colonSeparator
+          + value;
+        return indent + spaceString + keyValue;
+      }).filter(value => value !== undefined);
+
+      seen.splice(seen.indexOf(node), 1);
+      return '{' + out.join(',') + indent + '}';
+    }
+  })({ '': obj }, obj, 0);
+};
+
+export {array_chunks, serializeSpecialTypes, unserializeSpecialTypes, stableStringify};
