@@ -4,6 +4,7 @@ import {IGeopoint} from '../interfaces/IGeopoint';
 import {IDocumentReference} from '../interfaces/IDocumentReference';
 import DocumentReference = admin.firestore.DocumentReference;
 import GeoPoint = admin.firestore.GeoPoint;
+import Timeout = NodeJS.Timeout;
 
 // From https://stackoverflow.com/questions/8495687/split-array-into-chunks
 const array_chunks = (array: Array<any>, chunk_size: number): Array<Array<any>> => {
@@ -93,4 +94,60 @@ const isScalar = (val: any) => (typeof val === 'string' || val instanceof String
   || (val === null)
   || (typeof val === 'boolean');
 
-export {array_chunks, serializeSpecialTypes, unserializeSpecialTypes};
+interface ConcurrencyLimit {
+ wait(): Promise<void>;
+ done(): void
+}
+
+function limitConcurrency(maxConcurrency: number = 0, interval: number = 10): ConcurrencyLimit {
+  if (maxConcurrency === 0) {
+    return {
+      async wait(): Promise<void> { },
+      done() { }
+    }
+  }
+  let unfinishedCount = 0;
+  let resolveQueue: Function[] = [];
+  let intervalId: Timeout;
+  let started = false;
+
+  function start() {
+    started = true;
+    intervalId = setInterval(() => {
+      if (resolveQueue.length === 0) {
+        started = false;
+        clearInterval(intervalId);
+        return;
+      }
+
+      while (unfinishedCount <= maxConcurrency && resolveQueue.length > 0) {
+        const resolveFn = resolveQueue.shift();
+        unfinishedCount++;
+        if (resolveFn) resolveFn();
+      }
+
+    }, interval);
+  }
+
+  return {
+    wait(): Promise<void> {
+      return new Promise(resolve => {
+        if (!started) start();
+        resolveQueue.push(resolve)
+      });
+    },
+    done() {
+      unfinishedCount--;
+    }
+  }
+}
+
+const measureTimeAsync = async <T>( info: string, fn: () => Promise<T>): Promise<T> => {
+  const startTime = Date.now();
+  const result = await fn();
+  const timeDiff = Date.now() - startTime;
+  console.log(`${info} took ${timeDiff}ms`);
+  return result;
+}
+
+export {array_chunks, serializeSpecialTypes, unserializeSpecialTypes, ConcurrencyLimit, limitConcurrency, measureTimeAsync};

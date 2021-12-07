@@ -14,12 +14,14 @@ import {
   commandLineParams as params,
   packageInfo,
 } from './bin-common';
+import {measureTimeAsync} from "../lib/helpers";
 
 commander.version(packageInfo.version)
   .option(...buildOption(params.accountCredentialsPath))
   .option(...buildOption(params.backupFileImport))
   .option(...buildOption(params.nodePath))
   .option(...buildOption(params.yesToImport))
+  .option(...buildOption(params.maxConcurrency))
   .parse(process.argv);
 
 const accountCredentialsPath = commander[params.accountCredentialsPath.key] || process.env[accountCredentialsEnvironmentKey];
@@ -52,6 +54,8 @@ const nodePath = commander[params.nodePath.key];
 
 const unattendedConfirmation = commander[params.yesToImport.key];
 
+const maxConcurrency = parseInt(commander[params.maxConcurrency.key]) || 0;
+
 (async () => {
   const credentials = await getCredentialsFromFile(accountCredentialsPath);
   const db = getFirestoreDBReference(credentials);
@@ -79,7 +83,7 @@ const unattendedConfirmation = commander[params.yesToImport.key];
   }
 
   console.log(colors.bold(colors.green('Starting Import 🏋️')));
-  await firestoreImport(data, pathReference, true, true);
+  await measureTimeAsync("firestore-import", () => firestoreImport(data, pathReference, true, maxConcurrency, true));
   console.log(colors.bold(colors.green('All done 🎉')));
 })().catch((error) => {
   if (error instanceof ActionAbortedError) {
