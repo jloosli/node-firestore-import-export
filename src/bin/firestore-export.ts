@@ -6,13 +6,14 @@ import fs from 'fs';
 import {firestoreExport} from '../lib';
 import {getCredentialsFromFile, getDBReferenceFromPath, getFirestoreDBReference} from '../lib/firestore-helpers';
 import {accountCredentialsEnvironmentKey, buildOption, commandLineParams as params, packageInfo} from './bin-common';
-import {measureTimeAsync} from "../lib/helpers";
+import {measureTimeAsync, stableStringify} from "../lib/helpers";
 
 commander.version(packageInfo.version)
   .option(...buildOption(params.accountCredentialsPath))
   .option(...buildOption(params.backupFileExport))
   .option(...buildOption(params.nodePath))
   .option(...buildOption(params.prettyPrint))
+  .option(...buildOption(params.sortKeys))
   .parse(process.argv);
 
 const accountCredentialsPath = commander[params.accountCredentialsPath.key] || process.env[accountCredentialsEnvironmentKey];
@@ -48,6 +49,7 @@ const writeResults = (results: string, filename: string): Promise<string> => {
 };
 
 const prettyPrint = Boolean(commander[params.prettyPrint.key]);
+const sortKeys = Boolean(commander[params.sortKeys.key]);
 const nodePath = commander[params.nodePath.key];
 
 (async () => {
@@ -57,7 +59,7 @@ const nodePath = commander[params.nodePath.key];
   console.log(colors.bold(colors.green('Starting Export 🏋️')));
   await measureTimeAsync("firestore-export", async () => {
     const results = await firestoreExport(pathReference, true);
-    const stringResults = JSON.stringify(results, undefined, prettyPrint ? 2 : undefined);
+  const stringResults = stringify(results, prettyPrint ? 2 : undefined);
     await writeResults(stringResults, backupFile);
   });
   console.log(colors.yellow(`Results were saved to ${backupFile}`));
@@ -71,5 +73,11 @@ const nodePath = commander[params.nodePath.key];
   }
 });
 
+function stringify(results: unknown, space?: number): string {
+  if (sortKeys) {
+    return stableStringify(results, space)
+  }
+  return JSON.stringify(results, undefined, space);
+}
 
 

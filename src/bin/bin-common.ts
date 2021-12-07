@@ -55,6 +55,11 @@ const commandLineParams: { [param: string]: Params } =
       key: 'prettyPrint',
       description: 'JSON backups done with pretty-printing.',
     },
+    sortKeys: {
+      shortKey: 's',
+      key: 'sortKeys',
+      description: 'Sort keys to get a deterministic key order in the backup.',
+    },
   };
 
 const buildOption = ({shortKey, key, args = '', description}: Params): [string, string] => [`-${shortKey} --${key} ${args}`, description];
