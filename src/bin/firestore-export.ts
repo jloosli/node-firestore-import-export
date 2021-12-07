@@ -6,6 +6,7 @@ import fs from 'fs';
 import {firestoreExport} from '../lib';
 import {getCredentialsFromFile, getDBReferenceFromPath, getFirestoreDBReference} from '../lib/firestore-helpers';
 import {accountCredentialsEnvironmentKey, buildOption, commandLineParams as params, packageInfo} from './bin-common';
+import {measureTimeAsync} from "../lib/helpers";
 
 commander.version(packageInfo.version)
   .option(...buildOption(params.accountCredentialsPath))
@@ -54,9 +55,11 @@ const nodePath = commander[params.nodePath.key];
   const db = getFirestoreDBReference(credentials);
   const pathReference = getDBReferenceFromPath(db, nodePath);
   console.log(colors.bold(colors.green('Starting Export 🏋️')));
-  const results = await firestoreExport(pathReference, true);
-  const stringResults = JSON.stringify(results, undefined, prettyPrint ? 2 : undefined);
-  await writeResults(stringResults, backupFile);
+  await measureTimeAsync("firestore-export", async () => {
+    const results = await firestoreExport(pathReference, true);
+    const stringResults = JSON.stringify(results, undefined, prettyPrint ? 2 : undefined);
+    await writeResults(stringResults, backupFile);
+  });
   console.log(colors.yellow(`Results were saved to ${backupFile}`));
   console.log(colors.bold(colors.green('All done 🎉')));
 })().catch((error) => {

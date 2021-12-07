@@ -14,6 +14,7 @@ import {
   commandLineParams as params,
   packageInfo,
 } from './bin-common';
+import {measureTimeAsync} from "../lib/helpers";
 
 commander.version(packageInfo.version)
   .option(...buildOption(params.accountCredentialsPath))
@@ -82,7 +83,7 @@ const maxConcurrency = parseInt(commander[params.maxConcurrency.key]) || 0;
   }
 
   console.log(colors.bold(colors.green('Starting Import 🏋️')));
-  await firestoreImport(data, pathReference, true, maxConcurrency, true);
+  await measureTimeAsync("firestore-import", () => firestoreImport(data, pathReference, true, maxConcurrency, true));
   console.log(colors.bold(colors.green('All done 🎉')));
 })().catch((error) => {
   if (error instanceof ActionAbortedError) {

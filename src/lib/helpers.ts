@@ -142,4 +142,12 @@ function limitConcurrency(maxConcurrency: number = 0, interval: number = 10): Co
   }
 }
 
-export {array_chunks, serializeSpecialTypes, unserializeSpecialTypes, ConcurrencyLimit, limitConcurrency};
+const measureTimeAsync = async <T>( info: string, fn: () => Promise<T>): Promise<T> => {
+  const startTime = Date.now();
+  const result = await fn();
+  const timeDiff = Date.now() - startTime;
+  console.log(`${info} took ${timeDiff}ms`);
+  return result;
+}
+
+export {array_chunks, serializeSpecialTypes, unserializeSpecialTypes, ConcurrencyLimit, limitConcurrency, measureTimeAsync};
