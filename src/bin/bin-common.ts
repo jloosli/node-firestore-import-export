@@ -44,6 +44,12 @@ const commandLineParams: { [param: string]: Params } =
       key: 'noWait',
       description: 'Use with unattended confirmation to remove the 5 second delay.',
     },
+    maxConcurrency: {
+      shortKey: 'm',
+      key: 'maxConcurrency',
+      args: '<maxConcurrency>',
+      description: `Maximum import concurrency to prevent bandwidth exhausted and other load errors. The default (0) is unlimited.`,
+    },
     prettyPrint: {
       shortKey: 'p',
       key: 'prettyPrint',
