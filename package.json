@@ -27,7 +27,7 @@
     "clean": "node ./src/bin/clean.js",
     "tests": "mocha -r ts-node/register tests/**/*.spec.ts",
     "snyk-protect": "snyk protect",
-    "prepare": "npm run build && npm run snyk-protect"
+    "prepare": "npm run clean && tsc && npm run snyk-protect"
   },
   "bin": {
     "firestore-clear": "./dist/bin/firestore-clear.js",
