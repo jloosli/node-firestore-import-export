@@ -9,6 +9,7 @@ import {accountCredentialsEnvironmentKey, buildOption, commandLineParams as para
 import {measureTimeAsync, stableStringify} from "../lib/helpers";
 
 commander.version(packageInfo.version)
+  .option(...buildOption(params.excludeNodePath))
   .option(...buildOption(params.accountCredentialsPath))
   .option(...buildOption(params.backupFileExport))
   .option(...buildOption(params.nodePath))
@@ -51,6 +52,7 @@ const writeResults = (results: string, filename: string): Promise<string> => {
 const prettyPrint = Boolean(commander[params.prettyPrint.key]);
 const sortKeys = Boolean(commander[params.sortKeys.key]);
 const nodePath = commander[params.nodePath.key];
+const excludeNodePath = commander[params.excludeNodePath.key];
 
 (async () => {
   const credentials = await getCredentialsFromFile(accountCredentialsPath);
@@ -58,7 +60,7 @@ const nodePath = commander[params.nodePath.key];
   const pathReference = getDBReferenceFromPath(db, nodePath);
   console.log(colors.bold(colors.green('Starting Export 🏋️')));
   await measureTimeAsync("firestore-export", async () => {
-    const results = await firestoreExport(pathReference, true);
+  const results = await firestoreExport(pathReference, true, excludeNodePath);
   const stringResults = stringify(results, prettyPrint ? 2 : undefined);
     await writeResults(stringResults, backupFile);
   });

@@ -62,5 +62,8 @@
     "ts-node": "^8.0.2",
     "typescript": "^3.1.6"
   },
+  "resolutions":{
+	  "@grpc/grpc-js":"1.6.7"
+  },
   "snyk": true
 }

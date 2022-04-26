@@ -23,6 +23,12 @@ const commandLineParams: { [param: string]: Params } =
       args: '<path>',
       description: 'Filename to store backup. (e.g. backups/full-backup.json).',
     },
+    excludeNodePath: {
+      shortKey: 'e',
+      key: 'excludeNodePath',
+      args: '<path>',
+      description: `Path to database node (has to be a collection) ito exclude`,
+    },
     nodePath: {
       shortKey: 'n',
       key: 'nodePath',
