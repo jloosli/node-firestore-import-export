@@ -43,7 +43,7 @@ const setDocuments = async (data: ICollection, startingRef: FirebaseFirestore.Co
       ' the root of the incoming data?');
   }
   const collections: Array<any> = [];
-  const chunks = array_chunks(Object.keys(data), 500);
+  const chunks = array_chunks(Object.keys(data), 100);
   const chunkPromises = chunks.map(async (documentKeys: string[], index: number) => {
     await batchLimit.wait();
 
