@@ -23,6 +23,12 @@ const commandLineParams: { [param: string]: Params } =
       args: '<path>',
       description: 'Filename to store backup. (e.g. backups/full-backup.json).',
     },
+    excludeNodePath: {
+      shortKey: 'e',
+      key: 'excludeNodePath',
+      args: '<path>',
+      description: `Path to database node (has to be a collection) ito exclude`,
+    },
     nodePath: {
       shortKey: 'n',
       key: 'nodePath',
@@ -44,10 +50,21 @@ const commandLineParams: { [param: string]: Params } =
       key: 'noWait',
       description: 'Use with unattended confirmation to remove the 5 second delay.',
     },
+    maxConcurrency: {
+      shortKey: 'm',
+      key: 'maxConcurrency',
+      args: '<maxConcurrency>',
+      description: `Maximum import concurrency to prevent bandwidth exhausted and other load errors. The default (0) is unlimited.`,
+    },
     prettyPrint: {
       shortKey: 'p',
       key: 'prettyPrint',
       description: 'JSON backups done with pretty-printing.',
+    },
+    sortKeys: {
+      shortKey: 's',
+      key: 'sortKeys',
+      description: 'Sort keys to get a deterministic key order in the backup.',
     },
   };
 

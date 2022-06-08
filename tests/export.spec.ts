@@ -60,7 +60,7 @@ describe('Firestore Export', () => {
   });
 
   it('should return the full root structure', async () => {
-    const results = await firebaseExport(mockFirestore);
+    const results = await firebaseExport(mockFirestore, false, "");
     expect(results).to.deep.equal(sampleRootData);
   });
 

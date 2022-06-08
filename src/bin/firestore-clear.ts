@@ -13,6 +13,7 @@ import {
   commandLineParams as params,
   packageInfo,
 } from './bin-common';
+import {measureTimeAsync} from "../lib/helpers";
 
 
 commander.version(packageInfo.version)
@@ -64,7 +65,7 @@ const noWait = commander[params.yesToNoWait.key];
     await sleep(5000);
   }
   console.log(colors.bold(colors.green('Starting clearing of records 🏋️')));
-  await firestoreClear(pathReference, true);
+  await measureTimeAsync("firestore-clear", () => firestoreClear(pathReference, true));
   console.log(colors.bold(colors.green('All done 🎉')));
 })().catch((error) => {
   if (error instanceof ActionAbortedError) {
