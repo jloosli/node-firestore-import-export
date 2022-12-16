@@ -2,7 +2,6 @@ import 'mocha';
 import {expect} from 'chai';
 import {
   batchExecutor,
-  getCredentialsFromFile,
   getDBReferenceFromPath,
   isLikeDocument,
   isRootOfDatabase,
@@ -60,18 +59,6 @@ describe('Firestore Helpers', () => {
     it('should see a Firestore reference like a document', () => {
       const mockFirestore = new firebasemock.MockFirestore();
       expect(isLikeDocument(mockFirestore)).to.be.true;
-    });
-  });
-
-  describe('getCredentialsFromFile()', () => {
-    it(`should fail if the file doesn't exist`, async () => {
-      const dummyFilename = 'i_do_not_exist.json';
-      try {
-        await getCredentialsFromFile(dummyFilename);
-        expect.fail(null, 'This should not be run');
-      } catch (e) {
-        expect(e).to.exist;
-      }
     });
   });
 

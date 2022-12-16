@@ -1,3 +1,3 @@
-const del = require('del');
-
-del.sync(['dist']);
+import("del").then((module) => {
+  module.deleteSync(["dist"]);
+});

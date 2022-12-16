@@ -1,17 +1,11 @@
 import * as admin from 'firebase-admin';
-import loadJsonFile from 'load-json-file';
-import {IFirebaseCredentials} from '../interfaces/IFirebaseCredentials';
+import { applicationDefault } from 'firebase-admin/app';
 
 const SLEEP_TIME = 1000;
 
-const getCredentialsFromFile = (credentialsFilename: string): Promise<IFirebaseCredentials> => {
-  return loadJsonFile(credentialsFilename);
-};
-
-const getFirestoreDBReference = (credentials: IFirebaseCredentials): admin.firestore.Firestore => {
+const getFirestoreDBReference = (): admin.firestore.Firestore => {
   admin.initializeApp({
-    credential: admin.credential.cert(credentials as any),
-    databaseURL: `https://${(credentials as any).project_id}.firebaseio.com`,
+    credential: applicationDefault()
   });
 
   return admin.firestore();
@@ -60,7 +54,7 @@ const safelyGetCollectionsSnapshot = async (startingRef: admin.firestore.Firesto
     try {
       collectionsSnapshot = await startingRef.listCollections();
       deadlineError = false;
-    } catch (e) {
+    } catch (e: any) {
       if (e.message === 'Deadline Exceeded') {
         logs && console.log(`Deadline Error in getCollections()...waiting ${SLEEP_TIME / 1000} second(s) before retrying`);
         await sleep(SLEEP_TIME);
@@ -79,7 +73,7 @@ const safelyGetDocumentReferences = async (collectionRef: FirebaseFirestore.Coll
     try {
       allDocuments = await collectionRef.listDocuments();
       deadlineError = false;
-    } catch (e) {
+    } catch (e: any) {
       if (e.code && e.code === 4) {
         logs && console.log(`Deadline Error in getDocuments()...waiting ${SLEEP_TIME / 1000} second(s) before retrying`);
         await sleep(SLEEP_TIME);
@@ -97,7 +91,6 @@ type anyFirebaseRef = admin.firestore.Firestore |
   FirebaseFirestore.CollectionReference
 
 export {
-  getCredentialsFromFile,
   getFirestoreDBReference,
   getDBReferenceFromPath,
   isLikeDocument,

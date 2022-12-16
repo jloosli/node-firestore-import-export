@@ -1,16 +1,8 @@
 const packageInfo = require('../../package.json');
-const accountCredentialsEnvironmentKey = 'GOOGLE_APPLICATION_CREDENTIALS';
-const defaultBackupFilename = 'firebase-export.json';
 
 
 const commandLineParams: { [param: string]: Params } =
   {
-    accountCredentialsPath: {
-      shortKey: 'a',
-      key: 'accountCredentials',
-      args: '<path>',
-      description: `path to Google Cloud account credentials JSON file. If missing, will look at the ${accountCredentialsEnvironmentKey} environment variable for the path. Defaults to '${defaultBackupFilename}' if missing.`,
-    },
     backupFileImport: {
       shortKey: 'b',
       key: 'backupFile',
@@ -63,7 +55,7 @@ class ActionAbortedError extends Error {
   }
 }
 
-export {packageInfo, accountCredentialsEnvironmentKey, commandLineParams, buildOption, ActionAbortedError};
+export {packageInfo, commandLineParams, buildOption, ActionAbortedError};
 
 interface Params {
   shortKey: string;

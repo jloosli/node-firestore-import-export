@@ -1,41 +1,28 @@
 #!/usr/bin/env node
-import commander from 'commander';
+import {Command} from 'commander';
 import {prompt} from 'enquirer';
 import colors from 'colors';
 import process from 'process';
+import * as admin from 'firebase-admin';
 import fs from 'fs';
 import {firestoreImport} from '../lib';
-import {getCredentialsFromFile, getDBReferenceFromPath, getFirestoreDBReference} from '../lib/firestore-helpers';
+import {getDBReferenceFromPath, getFirestoreDBReference} from '../lib/firestore-helpers';
 import loadJsonFile from 'load-json-file';
 import {
-  accountCredentialsEnvironmentKey,
   ActionAbortedError,
   buildOption,
   commandLineParams as params,
   packageInfo,
 } from './bin-common';
 
+const commander = new Command();
 commander.version(packageInfo.version)
-  .option(...buildOption(params.accountCredentialsPath))
   .option(...buildOption(params.backupFileImport))
   .option(...buildOption(params.nodePath))
   .option(...buildOption(params.yesToImport))
   .parse(process.argv);
 
-const accountCredentialsPath = commander[params.accountCredentialsPath.key] || process.env[accountCredentialsEnvironmentKey];
-if (!accountCredentialsPath) {
-  console.log(colors.bold(colors.red('Missing: ')) + colors.bold(params.accountCredentialsPath.key) + ' - ' + params.accountCredentialsPath.description);
-  commander.help();
-  process.exit(1);
-}
-
-if (!fs.existsSync(accountCredentialsPath)) {
-  console.log(colors.bold(colors.red('Account credentials file does not exist: ')) + colors.bold(accountCredentialsPath));
-  commander.help();
-  process.exit(1);
-}
-
-const backupFile = commander[params.backupFileImport.key];
+const backupFile = commander.opts()[params.backupFileImport.key];
 if (!backupFile) {
   console.log(colors.bold(colors.red('Missing: ')) + colors.bold(params.backupFileImport.key) + ' - ' + params.backupFileImport.description);
   commander.help();
@@ -48,20 +35,19 @@ if (!fs.existsSync(backupFile)) {
   process.exit(1);
 }
 
-const nodePath = commander[params.nodePath.key];
+const nodePath = commander.opts()[params.nodePath.key];
 
-const unattendedConfirmation = commander[params.yesToImport.key];
+const unattendedConfirmation = commander.opts()[params.yesToImport.key];
 
 (async () => {
-  const credentials = await getCredentialsFromFile(accountCredentialsPath);
-  const db = getFirestoreDBReference(credentials);
+  const db = getFirestoreDBReference();
   const pathReference = await getDBReferenceFromPath(db, nodePath);
   const data = await loadJsonFile(backupFile);
 
   if (!unattendedConfirmation) {
     const nodeLocation = (<FirebaseFirestore.DocumentReference | FirebaseFirestore.CollectionReference>pathReference)
       .path || '[database root]';
-    const projectID = process.env.FIRESTORE_EMULATOR_HOST || (credentials as any).project_id;
+    const projectID = process.env.FIRESTORE_EMULATOR_HOST || (admin.apps[0]?.options.credential as any).projectId;
     const importText = `About to import data '${backupFile}' to the '${projectID}' firestore at '${nodeLocation}'.`;
 
     console.log(`\n\n${colors.bold(colors.blue(importText))}`);
