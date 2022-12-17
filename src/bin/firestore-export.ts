@@ -4,11 +4,19 @@ import colors from 'colors';
 import process from 'process';
 import fs from 'fs';
 import {firestoreExport} from '../lib';
-import {getDBReferenceFromPath, getFirestoreDBReference} from '../lib/firestore-helpers';
-import {buildOption, commandLineParams as params, packageInfo} from './bin-common';
+import {
+  getDBReferenceFromPath,
+  getFirestoreDBReference,
+} from '../lib/firestore-helpers';
+import {
+  buildOption,
+  commandLineParams as params,
+  packageInfo,
+} from './bin-common';
 
 const commander = new Command();
-commander.version(packageInfo.version)
+commander
+  .version(packageInfo.version)
   .option(...buildOption(params.backupFileExport))
   .option(...buildOption(params.nodePath))
   .option(...buildOption(params.prettyPrint))
@@ -16,7 +24,12 @@ commander.version(packageInfo.version)
 
 const backupFile = commander.opts()[params.backupFileExport.key];
 if (!backupFile) {
-  console.log(colors.bold(colors.red('Missing: ')) + colors.bold(params.backupFileExport.key) + ' - ' + params.backupFileExport.description);
+  console.log(
+    colors.bold(colors.red('Missing: ')) +
+      colors.bold(params.backupFileExport.key) +
+      ' - ' +
+      params.backupFileExport.description
+  );
   commander.help();
   process.exit(1);
 }
@@ -41,11 +54,15 @@ const nodePath = commander.opts()[params.nodePath.key];
   const pathReference = getDBReferenceFromPath(db, nodePath);
   console.log(colors.bold(colors.green('Starting Export 🏋️')));
   const results = await firestoreExport(pathReference, true);
-  const stringResults = JSON.stringify(results, undefined, prettyPrint ? 2 : undefined);
+  const stringResults = JSON.stringify(
+    results,
+    undefined,
+    prettyPrint ? 2 : undefined
+  );
   await writeResults(stringResults, backupFile);
   console.log(colors.yellow(`Results were saved to ${backupFile}`));
   console.log(colors.bold(colors.green('All done 🎉')));
-})().catch((error) => {
+})().catch(error => {
   if (error instanceof Error) {
     console.log(colors.red(error.message));
     process.exit(1);
@@ -53,6 +70,3 @@ const nodePath = commander.opts()[params.nodePath.key];
     console.log(colors.red(error));
   }
 });
-
-
-

@@ -27,7 +27,11 @@
     "clean": "node ./src/bin/clean.js",
     "tests": "mocha -r ts-node/register tests/**/*.spec.ts",
     "snyk-protect": "snyk protect",
-    "prepare": "npm run build && npm run snyk-protect"
+    "prepare": "npm run build && npm run snyk-protect",
+    "lint": "gts lint",
+    "clean1": "gts clean",
+    "compile": "tsc",
+    "fix": "gts fix"
   },
   "bin": {
     "firestore-clear": "./dist/bin/firestore-clear.js",
@@ -57,6 +61,7 @@
     "chai": "^4.3.7",
     "del": "^7.0.0",
     "firebase-mock": "^2.3.2",
+    "gts": "^3.1.1",
     "mocha": "^10.2.0",
     "snyk": "^1.1071.0",
     "ts-node": "^10.9.1",

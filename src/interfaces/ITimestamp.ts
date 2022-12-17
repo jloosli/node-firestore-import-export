@@ -5,5 +5,5 @@ export interface ITimestamp extends ISpecialType {
   value: {
     _seconds: number;
     _nanoseconds: number;
-  }
+  };
 }

@@ -13,7 +13,6 @@ import CollectionReference = FirebaseFirestore.CollectionReference;
 
 const firebasemock = require('firebase-mock');
 
-
 describe('Firestore Helpers', () => {
   describe('sleep()', () => {
     it('should sleep at least the specified amount of time', done => {
@@ -53,7 +52,9 @@ describe('Firestore Helpers', () => {
     });
     it('should see a collection reference not like a document', () => {
       const mockFirestore = new firebasemock.MockFirestore();
-      const collectionReference = mockFirestore.collection('collection/document/subCollection');
+      const collectionReference = mockFirestore.collection(
+        'collection/document/subCollection'
+      );
       expect(isLikeDocument(collectionReference)).to.be.false;
     });
     it('should see a Firestore reference like a document', () => {
@@ -74,44 +75,44 @@ describe('Firestore Helpers', () => {
       const mockFirestore = new firebasemock.MockFirestore();
       const collectionPath = 'collection/doc/subCollection';
       const dbReference = getDBReferenceFromPath(mockFirestore, collectionPath);
-      expect((dbReference as CollectionReference).path).to.equal(collectionPath);
+      expect((dbReference as CollectionReference).path).to.equal(
+        collectionPath
+      );
     });
   });
 
   describe('batchExecutor', () => {
-
     const toPromise = async function (x: any) {
       return x;
     };
 
     it('should resolve lists smaller then the batchsize', async () => {
       const input = [toPromise(1), toPromise(2)];
-      let actual = await batchExecutor(input, 3);
+      const actual = await batchExecutor(input, 3);
       expect(actual).to.eql([1, 2]);
     });
 
     it('should resolve lists equal to the batchsize', async () => {
       const input = [toPromise(1), toPromise(2)];
-      let actual = await batchExecutor(input, 1);
+      const actual = await batchExecutor(input, 1);
       expect(actual).to.eql([1, 2]);
     });
 
     it('should resolve lists larger then the batchsize', async () => {
       const input = [toPromise(1), toPromise(2)];
-      let actual = await batchExecutor(input, 1);
+      const actual = await batchExecutor(input, 1);
       expect(actual).to.eql([1, 2]);
     });
   });
 
   describe('safelyGetCollectionsSnapshot', () => {
     const mockFirestore = new firebasemock.MockFirestore();
-    it(`should `, async () => {
+    it('should ', async () => {
       mockFirestore.collection('bob').add({name: 'bob', place: 'south'});
       mockFirestore.collection('sam').add({name: 'sam', place: 'north'});
       const snapshot = await safelyGetCollectionsSnapshot(mockFirestore);
       expect(snapshot.map(coll => coll.id)).to.eql(['bob', 'sam']);
     });
-
   });
 
   /**
