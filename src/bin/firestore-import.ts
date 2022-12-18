@@ -10,7 +10,6 @@ import {
   getDBReferenceFromPath,
   getFirestoreDBReference,
 } from '../lib/firestore-helpers';
-import loadJsonFile from 'load-json-file';
 import {
   ActionAbortedError,
   buildOption,
@@ -54,8 +53,9 @@ const unattendedConfirmation = commander.opts()[params.yesToImport.key];
 (async () => {
   const db = getFirestoreDBReference();
   const pathReference = await getDBReferenceFromPath(db, nodePath);
-  const data = await loadJsonFile(backupFile);
-
+  const buffer = await fs.promises.readFile(backupFile);
+  const str = new TextDecoder().decode(buffer);
+  const data = JSON.parse(str);
   if (!unattendedConfirmation) {
     const nodeLocation =
       (<

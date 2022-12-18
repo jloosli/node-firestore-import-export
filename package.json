@@ -29,8 +29,6 @@
     "snyk-protect": "snyk protect",
     "prepare": "npm run build && npm run snyk-protect",
     "lint": "gts lint",
-    "clean1": "gts clean",
-    "compile": "tsc",
     "fix": "gts fix"
   },
   "bin": {
@@ -46,16 +44,12 @@
     "@google-cloud/firestore": "^6.4.1",
     "colors": "^1.4.0",
     "commander": "^9.4.1",
-    "core-js": "^3.26.1",
     "enquirer": "^2.3.6",
-    "firebase-admin": "^11.4.0",
-    "firebase-functions": "^4.1.1",
-    "load-json-file": "^6.2.0"
+    "firebase-admin": "^11.4.0"
   },
   "devDependencies": {
     "@types/chai": "^4.3.4",
     "@types/color": "^3.0.3",
-    "@types/core-js": "^2.5.5",
     "@types/mocha": "^10.0.1",
     "@types/node": "^18.11.16",
     "chai": "^4.3.7",
