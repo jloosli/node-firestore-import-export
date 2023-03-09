@@ -1,0 +1,24 @@
+repos:
+  - hooks:
+      - id: check-merge-conflict
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
+      - id: requirements-txt-fixer
+      - id: check-json
+      - id: check-yaml
+      - id: debug-statements
+      - id: check-symlinks
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+    repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.3.0
+  - hooks:
+      - additional_dependencies:
+          - mdformat-toc
+          - mdformat-tables
+        args:
+          - --wrap=80
+        exclude: README_TF\.md
+        id: mdformat
+    repo: https://github.com/executablebooks/mdformat
+    rev: 0.7.16
