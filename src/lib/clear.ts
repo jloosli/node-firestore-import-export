@@ -5,12 +5,12 @@ import {
   safelyGetCollectionsSnapshot,
   safelyGetDocumentReferences,
 } from './firestore-helpers';
-import * as admin from 'firebase-admin';
 import DocumentReference = FirebaseFirestore.DocumentReference;
+import {Firestore} from '@google-cloud/firestore';
 
 const clearData = async (
   startingRef:
-    | admin.firestore.Firestore
+    | Firestore
     | FirebaseFirestore.DocumentReference
     | FirebaseFirestore.CollectionReference,
   logs = false
@@ -30,7 +30,7 @@ const clearData = async (
 };
 
 const clearCollections = async (
-  startingRef: admin.firestore.Firestore | FirebaseFirestore.DocumentReference,
+  startingRef: Firestore | FirebaseFirestore.DocumentReference,
   logs = false
 ) => {
   const collectionPromises: Array<() => Promise<any>> = [];

@@ -1,3 +1,4 @@
+import {Firestore} from '@google-cloud/firestore';
 import {
   batchExecutor,
   isLikeDocument,
@@ -5,12 +6,11 @@ import {
   safelyGetCollectionsSnapshot,
   safelyGetDocumentReferences,
 } from './firestore-helpers';
-import * as admin from 'firebase-admin';
 import {serializeSpecialTypes} from './helpers';
 
 const exportData = async (
   startingRef:
-    | admin.firestore.Firestore
+    | Firestore
     | FirebaseFirestore.DocumentReference
     | FirebaseFirestore.CollectionReference,
   logs = false
@@ -39,7 +39,7 @@ const exportData = async (
 };
 
 const getCollections = async (
-  startingRef: admin.firestore.Firestore | FirebaseFirestore.DocumentReference,
+  startingRef: Firestore | FirebaseFirestore.DocumentReference,
   logs = false
 ) => {
   const collectionNames: Array<string> = [];

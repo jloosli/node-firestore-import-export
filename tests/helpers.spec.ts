@@ -1,3 +1,4 @@
+import firestore from '@google-cloud/firestore';
 import {
   array_chunks,
   serializeSpecialTypes,
@@ -5,61 +6,22 @@ import {
 } from '../src/lib/helpers';
 import {expect} from 'chai';
 import 'mocha';
-import * as admin from 'firebase-admin';
 
 const special = {
   object: {
     name: 'object',
-    timestamp: new admin.firestore.Timestamp(1541579025, 0),
+    timestamp: new firestore.Timestamp(1541579025, 0),
   },
   array: {
     0: 1,
     1: new Date(),
   },
-  timestamp: new admin.firestore.Timestamp(1541579025, 0),
-  geopoint: new admin.firestore.GeoPoint(12.3433, -111.324),
+  timestamp: new firestore.Timestamp(1541579025, 0),
+  geopoint: new firestore.GeoPoint(12.3433, -111.324),
   number: 234234.234,
 };
 
 const sampleExportedDoc = require('./sampleExportedDoc.json');
-
-const serialized = {
-  object: {
-    name: 'object',
-    timestamp: {
-      __datatype__: 'timestamp',
-      value: {
-        _seconds: 1541579025,
-        _nanoseconds: 0,
-      },
-    },
-  },
-  array: {
-    '0': 1,
-    '1': {
-      __datatype__: 'timestamp',
-      value: {
-        _seconds: 1541579025,
-        _nanoseconds: 0,
-      },
-    },
-  },
-  timestamp: {
-    __datatype__: 'timestamp',
-    value: {
-      _seconds: 1541579025,
-      _nanoseconds: 0,
-    },
-  },
-  geopoint: {
-    __datatype__: 'geopoint',
-    value: {
-      _latitude: 12.3433,
-      _longitude: -111.324,
-    },
-  },
-  number: 234234.234,
-};
 
 describe('Helpers', () => {
   describe('array_chunks', () => {
@@ -106,19 +68,18 @@ describe('Helpers', () => {
   });
 
   describe('unserializeSpecialTypes', () => {
-    admin.initializeApp();
     const results = unserializeSpecialTypes(sampleExportedDoc);
     expect(results.sampleExportedDoc.timestamp).to.be.an.instanceof(
-      admin.firestore.Timestamp
+      firestore.Timestamp
     );
     expect(results.sampleExportedDoc.geopoint).to.be.an.instanceof(
-      admin.firestore.GeoPoint
+      firestore.GeoPoint
     );
     expect(results.sampleExportedDoc.documentRef).to.be.an.instanceof(
-      admin.firestore.DocumentReference
+      firestore.DocumentReference
     );
     expect(results.sampleExportedDoc.documentRef).to.be.an.instanceof(
-      admin.firestore.DocumentReference
+      firestore.DocumentReference
     );
   });
 });
