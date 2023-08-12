@@ -87,7 +87,7 @@ const unattendedConfirmation = commander.opts()[params.yesToImport.key];
   }
 
   console.log(colors.bold(colors.green('Starting Import 🏋️')));
-  await firestoreImport(data, pathReference, true, true);
+  await firestoreImport(data, pathReference, false, true);
   console.log(colors.bold(colors.green('All done 🎉')));
 })().catch(error => {
   if (error instanceof ActionAbortedError) {
