@@ -71,17 +71,21 @@ describe('Helpers', () => {
 
     it('should have the final chunk size the same as the remainder of the chunk_size', () => {
       const startingArraySize = 100;
-      const randomChunkSize = Math.floor(Math.random() * startingArraySize) + 1;
-      const expectedRemainder = startingArraySize % randomChunkSize;
-      const expectedLengthOfChunks =
-        Math.floor(startingArraySize / randomChunkSize) +
-        (expectedRemainder === 0 ? 0 : 1);
-      const startingArray = new Array(startingArraySize).fill(null);
-      const chunks = array_chunks(startingArray, randomChunkSize);
-      expect(chunks).to.have.lengthOf(Math.floor(expectedLengthOfChunks));
 
-      const lastItem = chunks.pop();
-      expect(lastItem).to.have.lengthOf(expectedRemainder);
+      for(let chunkSize = 1; chunkSize <= startingArraySize; ++chunkSize){
+        let expectedRemainder = startingArraySize % chunkSize;
+        const expectedLengthOfChunks =
+          Math.floor(startingArraySize / chunkSize) +
+          (expectedRemainder === 0 ? 0 : 1);
+        expectedRemainder = expectedRemainder === 0 ? chunkSize : expectedRemainder
+        const startingArray = new Array(startingArraySize).fill(null);
+        const chunks = array_chunks(startingArray, chunkSize);
+        expect(chunks).to.have.lengthOf(Math.floor(expectedLengthOfChunks));
+
+        const lastItem = chunks.pop();
+        expect(lastItem).to.have.lengthOf(expectedRemainder);
+      }
+
     });
   });
 
