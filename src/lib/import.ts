@@ -86,9 +86,11 @@ const setDocuments = (
       }
       const {__collections__, ...documents} = data[documentKey];
       const documentData: any = unserializeSpecialTypes(documents);
-      batch.set(startingRef.doc(documentKey), documentData, {
-        merge: mergeWithExisting,
-      });
+      if(!documentData['_import-export-flag-doesnotexists_']){
+        batch.set(startingRef.doc(documentKey), documentData, {
+          merge: mergeWithExisting,
+        });
+      }
     });
     return () => batch.commit();
   });

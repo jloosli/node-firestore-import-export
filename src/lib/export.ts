@@ -79,7 +79,7 @@ const getDocuments = async (
             docSnapshot.data()
           );
         } else {
-          docDetails[docSnapshot.id] = {};
+          docDetails[docSnapshot.id] = {'_import-export-flag-doesnotexists_': true};
         }
         docDetails[docSnapshot.id]['__collections__'] = await getCollections(
           docSnapshot.ref,
