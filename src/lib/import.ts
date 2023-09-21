@@ -21,11 +21,11 @@ const importData = (
       );
     }
     const collections = dataToImport['__collections__'];
-    const collectionPromises: Array<Promise<any>> = [];
+    const collectionPromises: Array<() => Promise<any>> = [];
     for (const collection in collections) {
       if (collections.hasOwnProperty(collection)) {
         collectionPromises.push(
-          setDocuments(
+          () => setDocuments(
             collections[collection],
             startingRef.collection(collection),
             mergeWithExisting,
@@ -35,7 +35,7 @@ const importData = (
       }
     }
     if (isRootOfDatabase(startingRef)) {
-      return batchExecutor(collectionPromises);
+      return batchExecutor(collectionPromises, 1);
     } else {
       const documentID = startingRef.id;
       const documentData: any = {};
@@ -46,7 +46,7 @@ const importData = (
         mergeWithExisting,
         logs
       );
-      return documentPromise.then(() => batchExecutor(collectionPromises));
+      return documentPromise.then(() => batchExecutor(collectionPromises, 1));
     }
   } else {
     return setDocuments(
@@ -90,15 +90,15 @@ const setDocuments = (
         merge: mergeWithExisting,
       });
     });
-    return batch.commit();
+    return () => batch.commit();
   });
   return batchExecutor(chunkPromises)
     .then(() => {
       return collections.map(col => {
-        return setDocuments(col.collection, col.path, mergeWithExisting, logs);
+        return () => setDocuments(col.collection, col.path, mergeWithExisting, logs);
       });
     })
-    .then(subCollectionPromises => batchExecutor(subCollectionPromises))
+    .then(subCollectionPromises => batchExecutor(subCollectionPromises, 1))
     .catch(err => {
       logs && console.error(err);
     });
