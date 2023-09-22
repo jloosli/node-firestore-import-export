@@ -48,7 +48,7 @@
     "@types/chai": "^4.3.6",
     "@types/color": "^3.0.4",
     "@types/mocha": "^10.0.1",
-    "@types/node": "^20.6.2",
+    "@types/node": "^20.6.3",
     "chai": "^4.3.8",
     "firebase-mock": "^2.3.2",
     "gts": "^5.0.1",

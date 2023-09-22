@@ -56,7 +56,9 @@ const batchExecutor = async function <T>(
 ) {
   const res: T[] = [];
   while (promises.length > 0) {
-    const temp = await Promise.all(promises.splice(0, batchSize).map(fn => fn()));
+    const temp = await Promise.all(
+      promises.splice(0, batchSize).map(fn => fn())
+    );
     res.push(...temp);
   }
   return res;

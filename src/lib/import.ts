@@ -24,8 +24,8 @@ const importData = (
     const collectionPromises: Array<() => Promise<any>> = [];
     for (const collection in collections) {
       if (collections.hasOwnProperty(collection)) {
-        collectionPromises.push(
-          () => setDocuments(
+        collectionPromises.push(() =>
+          setDocuments(
             collections[collection],
             startingRef.collection(collection),
             mergeWithExisting,
@@ -86,7 +86,7 @@ const setDocuments = (
       }
       const {__collections__, ...documents} = data[documentKey];
       const documentData: any = unserializeSpecialTypes(documents);
-      if(!documentData['_import-export-flag-doesnotexists_']){
+      if (!documentData['_import-export-flag-doesnotexists_']) {
         batch.set(startingRef.doc(documentKey), documentData, {
           merge: mergeWithExisting,
         });
@@ -97,7 +97,8 @@ const setDocuments = (
   return batchExecutor(chunkPromises)
     .then(() => {
       return collections.map(col => {
-        return () => setDocuments(col.collection, col.path, mergeWithExisting, logs);
+        return () =>
+          setDocuments(col.collection, col.path, mergeWithExisting, logs);
       });
     })
     .then(subCollectionPromises => batchExecutor(subCollectionPromises, 1))
