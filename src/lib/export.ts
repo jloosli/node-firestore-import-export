@@ -16,12 +16,12 @@ const exportData = async (
   logs = false
 ) => {
   if (isLikeDocument(startingRef)) {
-    const collectionsPromise = getCollections(startingRef, logs);
-    let dataPromise: Promise<any>;
+    const collectionsPromise = () => getCollections(startingRef, logs);
+    let dataPromise: () => Promise<any>;
     if (isRootOfDatabase(startingRef)) {
-      dataPromise = Promise.resolve({});
+      dataPromise = () => Promise.resolve({});
     } else {
-      dataPromise = (<FirebaseFirestore.DocumentReference>startingRef)
+      dataPromise = () => (<FirebaseFirestore.DocumentReference>startingRef)
         .get()
         .then(snapshot => snapshot.data())
         .then(data => serializeSpecialTypes(data));
@@ -42,7 +42,7 @@ const getCollections = async (
   logs = false
 ) => {
   const collectionNames: Array<string> = [];
-  const collectionPromises: Array<Promise<any>> = [];
+  const collectionPromises: Array<() => Promise<any>> = [];
   const collectionsSnapshot = await safelyGetCollectionsSnapshot(
     startingRef,
     logs
@@ -50,7 +50,7 @@ const getCollections = async (
   collectionsSnapshot.map(
     (collectionRef: FirebaseFirestore.CollectionReference) => {
       collectionNames.push(collectionRef.id);
-      collectionPromises.push(getDocuments(collectionRef, logs));
+      collectionPromises.push(() => getDocuments(collectionRef, logs));
     }
   );
   const results = await batchExecutor(collectionPromises);
@@ -67,11 +67,11 @@ const getDocuments = async (
 ) => {
   logs && console.log(`Retrieving documents from ${collectionRef.path}`);
   const results: any = {};
-  const documentPromises: Array<Promise<object>> = [];
+  const documentPromises: Array<() => Promise<object>> = [];
   const allDocuments = await safelyGetDocumentReferences(collectionRef, logs);
   allDocuments.forEach(doc => {
     documentPromises.push(
-      new Promise(async resolve => {
+      () => new Promise(async resolve => {
         const docSnapshot = await doc.get();
         const docDetails: any = {};
         if (docSnapshot.exists) {
@@ -79,7 +79,7 @@ const getDocuments = async (
             docSnapshot.data()
           );
         } else {
-          docDetails[docSnapshot.id] = {};
+          docDetails[docSnapshot.id] = {'_import-export-flag-doesnotexists_': true};
         }
         docDetails[docSnapshot.id]['__collections__'] = await getCollections(
           docSnapshot.ref,
