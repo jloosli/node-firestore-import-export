@@ -1,21 +1,16 @@
-import * as admin from 'firebase-admin';
-import {applicationDefault} from 'firebase-admin/app';
+import {Firestore} from '@google-cloud/firestore';
 
 const SLEEP_TIME = 1000;
 
-const getFirestoreDBReference = (): admin.firestore.Firestore => {
-  admin.initializeApp({
-    credential: applicationDefault(),
-  });
-
-  return admin.firestore();
+const getFirestoreDBReference = (): Firestore => {
+  return new Firestore();
 };
 
 const getDBReferenceFromPath = (
-  db: admin.firestore.Firestore,
+  db: Firestore,
   dataPath?: string
 ):
-  | admin.firestore.Firestore
+  | Firestore
   | FirebaseFirestore.DocumentReference
   | FirebaseFirestore.CollectionReference => {
   let startingRef;
@@ -31,7 +26,7 @@ const getDBReferenceFromPath = (
 
 const isLikeDocument = (
   ref:
-    | admin.firestore.Firestore
+    | Firestore
     | FirebaseFirestore.DocumentReference
     | FirebaseFirestore.CollectionReference
 ): ref is FirebaseFirestore.DocumentReference => {
@@ -40,11 +35,11 @@ const isLikeDocument = (
 
 const isRootOfDatabase = (
   ref:
-    | admin.firestore.Firestore
+    | Firestore
     | FirebaseFirestore.DocumentReference
     | FirebaseFirestore.CollectionReference
-): ref is admin.firestore.Firestore => {
-  return (<admin.firestore.Firestore>ref).batch !== undefined;
+): ref is Firestore => {
+  return (<Firestore>ref).batch !== undefined;
 };
 
 const sleep = (timeInMS: number): Promise<void> =>
@@ -56,14 +51,16 @@ const batchExecutor = async function <T>(
 ) {
   const res: T[] = [];
   while (promises.length > 0) {
-    const temp = await Promise.all(promises.splice(0, batchSize).map(fn => fn()));
+    const temp = await Promise.all(
+      promises.splice(0, batchSize).map(fn => fn())
+    );
     res.push(...temp);
   }
   return res;
 };
 
 const safelyGetCollectionsSnapshot = async (
-  startingRef: admin.firestore.Firestore | FirebaseFirestore.DocumentReference,
+  startingRef: Firestore | FirebaseFirestore.DocumentReference,
   logs = false
 ): Promise<FirebaseFirestore.CollectionReference[]> => {
   let collectionsSnapshot,
@@ -119,7 +116,7 @@ const safelyGetDocumentReferences = async (
 };
 
 type anyFirebaseRef =
-  | admin.firestore.Firestore
+  | Firestore
   | FirebaseFirestore.DocumentReference
   | FirebaseFirestore.CollectionReference;
 

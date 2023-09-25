@@ -1,3 +1,4 @@
+import {Firestore} from '@google-cloud/firestore';
 import {
   batchExecutor,
   isLikeDocument,
@@ -5,12 +6,11 @@ import {
   safelyGetCollectionsSnapshot,
   safelyGetDocumentReferences,
 } from './firestore-helpers';
-import * as admin from 'firebase-admin';
 import {serializeSpecialTypes} from './helpers';
 
 const exportData = async (
   startingRef:
-    | admin.firestore.Firestore
+    | Firestore
     | FirebaseFirestore.DocumentReference
     | FirebaseFirestore.CollectionReference,
   logs = false
@@ -21,10 +21,11 @@ const exportData = async (
     if (isRootOfDatabase(startingRef)) {
       dataPromise = () => Promise.resolve({});
     } else {
-      dataPromise = () => (<FirebaseFirestore.DocumentReference>startingRef)
-        .get()
-        .then(snapshot => snapshot.data())
-        .then(data => serializeSpecialTypes(data));
+      dataPromise = () =>
+        (<FirebaseFirestore.DocumentReference>startingRef)
+          .get()
+          .then(snapshot => snapshot.data())
+          .then(data => serializeSpecialTypes(data));
     }
     return await batchExecutor([collectionsPromise, dataPromise]).then(res => {
       return {__collections__: res[0], ...res[1]};
@@ -38,7 +39,7 @@ const exportData = async (
 };
 
 const getCollections = async (
-  startingRef: admin.firestore.Firestore | FirebaseFirestore.DocumentReference,
+  startingRef: Firestore | FirebaseFirestore.DocumentReference,
   logs = false
 ) => {
   const collectionNames: Array<string> = [];
@@ -71,22 +72,25 @@ const getDocuments = async (
   const allDocuments = await safelyGetDocumentReferences(collectionRef, logs);
   allDocuments.forEach(doc => {
     documentPromises.push(
-      () => new Promise(async resolve => {
-        const docSnapshot = await doc.get();
-        const docDetails: any = {};
-        if (docSnapshot.exists) {
-          docDetails[docSnapshot.id] = serializeSpecialTypes(
-            docSnapshot.data()
+      () =>
+        new Promise(async resolve => {
+          const docSnapshot = await doc.get();
+          const docDetails: any = {};
+          if (docSnapshot.exists) {
+            docDetails[docSnapshot.id] = serializeSpecialTypes(
+              docSnapshot.data()
+            );
+          } else {
+            docDetails[docSnapshot.id] = {
+              '_import-export-flag-doesnotexists_': true,
+            };
+          }
+          docDetails[docSnapshot.id]['__collections__'] = await getCollections(
+            docSnapshot.ref,
+            logs
           );
-        } else {
-          docDetails[docSnapshot.id] = {'_import-export-flag-doesnotexists_': true};
-        }
-        docDetails[docSnapshot.id]['__collections__'] = await getCollections(
-          docSnapshot.ref,
-          logs
-        );
-        resolve(docDetails);
-      })
+          resolve(docDetails);
+        })
     );
   });
   (await batchExecutor(documentPromises)).forEach((res: any) => {

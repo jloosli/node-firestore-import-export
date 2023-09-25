@@ -1,9 +1,9 @@
-import * as admin from 'firebase-admin';
 import {ITimestamp} from '../interfaces/ITimestamp';
 import {IGeopoint} from '../interfaces/IGeopoint';
 import {IDocumentReference} from '../interfaces/IDocumentReference';
-import DocumentReference = admin.firestore.DocumentReference;
-import GeoPoint = admin.firestore.GeoPoint;
+import firestore = require('@google-cloud/firestore');
+import {DocumentReference, GeoPoint} from '@google-cloud/firestore';
+import {getFirestoreDBReference} from './firestore-helpers';
 
 // From https://stackoverflow.com/questions/8495687/split-array-into-chunks
 const array_chunks = (
@@ -20,7 +20,7 @@ const serializeSpecialTypes = (data: any) => {
   const cleaned: any = {};
   Object.keys(data).map(key => {
     let rawValue = data[key];
-    if (rawValue instanceof admin.firestore.Timestamp) {
+    if (rawValue instanceof firestore.Timestamp) {
       rawValue = {
         __datatype__: 'timestamp',
         value: {
@@ -66,9 +66,9 @@ const unserializeSpecialTypes = (data: any): any => {
           rawValue = rawValue as ITimestamp;
           if (rawValue.value instanceof String) {
             const millis = Date.parse(rawValue.value);
-            rawValue = new admin.firestore.Timestamp(millis / 1000, 0);
+            rawValue = new firestore.Timestamp(millis / 1000, 0);
           } else {
-            rawValue = new admin.firestore.Timestamp(
+            rawValue = new firestore.Timestamp(
               rawValue.value._seconds,
               rawValue.value._nanoseconds
             );
@@ -76,14 +76,14 @@ const unserializeSpecialTypes = (data: any): any => {
           break;
         case 'geopoint':
           rawValue = rawValue as IGeopoint;
-          rawValue = new admin.firestore.GeoPoint(
+          rawValue = new firestore.GeoPoint(
             rawValue.value._latitude,
             rawValue.value._longitude
           );
           break;
         case 'documentReference':
           rawValue = rawValue as IDocumentReference;
-          rawValue = admin.firestore().doc(rawValue.value);
+          rawValue = getFirestoreDBReference().doc(rawValue.value);
           break;
       }
     } else {

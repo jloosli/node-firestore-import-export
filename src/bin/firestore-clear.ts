@@ -2,7 +2,6 @@
 import {Command} from 'commander';
 import colors from 'colors';
 import process from 'process';
-import * as admin from 'firebase-admin';
 import {
   getDBReferenceFromPath,
   getFirestoreDBReference,
@@ -33,16 +32,6 @@ const noWait = commander.opts()[params.yesToNoWait.key];
 (async () => {
   const db = getFirestoreDBReference();
   const pathReference = getDBReferenceFromPath(db, nodePath);
-  const nodeLocation =
-    (<
-      | FirebaseFirestore.DocumentReference
-      | FirebaseFirestore.CollectionReference
-    >pathReference).path || '[database root]';
-  const projectID =
-    process.env.FIRESTORE_EMULATOR_HOST ||
-    (admin.apps[0]?.options.credential as any).projectId;
-  const deleteText = `About to clear all data from '${projectID}' firestore starting at '${nodeLocation}'.`;
-  console.log(`\n\n${colors.bold(colors.blue(deleteText))}`);
   if (!unattendedConfirmation) {
     console.log(
       colors.bgYellow(

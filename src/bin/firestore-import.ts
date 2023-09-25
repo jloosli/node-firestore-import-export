@@ -3,7 +3,6 @@ import {Command} from 'commander';
 import {prompt} from 'enquirer';
 import colors from 'colors';
 import process from 'process';
-import * as admin from 'firebase-admin';
 import fs from 'fs';
 import {firestoreImport} from '../lib';
 import {
@@ -57,17 +56,6 @@ const unattendedConfirmation = commander.opts()[params.yesToImport.key];
   const str = new TextDecoder().decode(buffer);
   const data = JSON.parse(str);
   if (!unattendedConfirmation) {
-    const nodeLocation =
-      (<
-        | FirebaseFirestore.DocumentReference
-        | FirebaseFirestore.CollectionReference
-      >pathReference).path || '[database root]';
-    const projectID =
-      process.env.FIRESTORE_EMULATOR_HOST ||
-      (admin.apps[0]?.options.credential as any).projectId;
-    const importText = `About to import data '${backupFile}' to the '${projectID}' firestore at '${nodeLocation}'.`;
-
-    console.log(`\n\n${colors.bold(colors.blue(importText))}`);
     console.log(
       colors.bgYellow(
         colors.blue(
