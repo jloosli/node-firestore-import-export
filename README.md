@@ -1,3 +1,10 @@
+# Notes
+
+Since the main version of this repo is not maintained, this is a version with a few fixes that is released on npm with the id of `node-firestore-import-export-fix`
+
+Also, I don't have any intention of maintaining this one. But if you have pull requests, send them my way and I'll try to release the changes to npm as well.
+
+
 # node-firestore-import-export
 
 Firestore data importing, exporting, and data clearing tool.
@@ -96,13 +103,7 @@ They each are serialized in the following format:
 ## Installation
 
 ```bash
-git clone https://github.com/cuong0993/node-firestore-import-export.git;
-
-cd node-firestore-import-export;
-
-yarn install;
-
-npm install -g .;
+npm install node-firestore-import-export-fix
 ```
 
 ### Retrieving Google Cloud Account Credentials
