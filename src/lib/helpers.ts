@@ -16,7 +16,7 @@ const array_chunks = (
     .map((begin: number) => array.slice(begin, begin + chunk_size));
 };
 
-const serializeSpecialTypes = (data: any) => {
+const serializeSpecialTypes = (data: any = {}) => {
   const cleaned: any = {};
   Object.keys(data).map(key => {
     let rawValue = data[key];
