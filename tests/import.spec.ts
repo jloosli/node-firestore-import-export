@@ -29,7 +29,10 @@ describe('Firestore Import', () => {
 
   it('should fail if trying to import malformed document to root of database', async () => {
     try {
-      const results = firestoreImport(sampleRootData.__collections__, mockFirestore);
+      const results = firestoreImport(
+        sampleRootData.__collections__,
+        mockFirestore
+      );
       await Promise.all([results]);
       expect.fail(null, 'This should not be run.');
     } catch (err) {
@@ -59,7 +62,10 @@ describe('Firestore Import', () => {
   it('should fail if document is malformed', async () => {
     try {
       const documentLocation = mockFirestore.doc('collectionA/DocA');
-      const results = firestoreImport(documentDataMissingCollections, documentLocation);
+      const results = firestoreImport(
+        documentDataMissingCollections,
+        documentLocation
+      );
       await Promise.all([results]);
       expect.fail(null, 'This should not be run.');
     } catch (err) {
@@ -71,8 +77,11 @@ describe('Firestore Import', () => {
     }
   });
 
-  it(`should not manipulate imported data object`, async () => {
-    const dump = {name: 'Alice', __collections__: {jobs: {123: {name: 'doctor'}}}};
+  it('should not manipulate imported data object', async () => {
+    const dump = {
+      name: 'Alice',
+      __collections__: {jobs: {123: {name: 'doctor'}}},
+    };
     await firestoreImport({['id1']: dump}, mockFirestore.collection('user'));
     expect(dump.__collections__.jobs['123'].name).to.eql('doctor');
   });

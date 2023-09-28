@@ -1,61 +1,27 @@
-import {array_chunks, serializeSpecialTypes, unserializeSpecialTypes} from '../src/lib/helpers';
+import firestore from '@google-cloud/firestore';
+import {
+  array_chunks,
+  serializeSpecialTypes,
+  unserializeSpecialTypes,
+} from '../src/lib/helpers';
 import {expect} from 'chai';
 import 'mocha';
-import * as admin from "firebase-admin";
 
 const special = {
   object: {
     name: 'object',
-    timestamp: new admin.firestore.Timestamp(1541579025, 0)
+    timestamp: new firestore.Timestamp(1541579025, 0),
   },
   array: {
     0: 1,
-    1: new Date()
+    1: new Date(),
   },
-  timestamp: new admin.firestore.Timestamp(1541579025, 0),
-  geopoint: new admin.firestore.GeoPoint(12.3433, -111.324),
+  timestamp: new firestore.Timestamp(1541579025, 0),
+  geopoint: new firestore.GeoPoint(12.3433, -111.324),
   number: 234234.234,
 };
 
 const sampleExportedDoc = require('./sampleExportedDoc.json');
-
-const serialized = {
-  "object": {
-    "name": "object",
-    "timestamp": {
-      "__datatype__": "timestamp",
-      "value": {
-        "_seconds": 1541579025,
-        "_nanoseconds": 0
-      }
-    }
-  },
-  "array": {
-    "0": 1,
-    "1": {
-      "__datatype__": "timestamp",
-      "value": {
-        "_seconds": 1541579025,
-        "_nanoseconds": 0
-      }
-    }
-  },
-  "timestamp": {
-    "__datatype__": "timestamp",
-    "value": {
-      "_seconds": 1541579025,
-      "_nanoseconds": 0
-    }
-  },
-  "geopoint": {
-    "__datatype__": "geopoint",
-    "value": {
-      "_latitude": 12.3433,
-      "_longitude": -111.324
-    }
-  },
-  "number": 234234.234
-};
 
 describe('Helpers', () => {
   describe('array_chunks', () => {
@@ -67,15 +33,21 @@ describe('Helpers', () => {
 
     it('should have the final chunk size the same as the remainder of the chunk_size', () => {
       const startingArraySize = 100;
-      const randomChunkSize = Math.floor(Math.random() * startingArraySize) + 1;
-      const expectedRemainder = startingArraySize % randomChunkSize;
-      const expectedLengthOfChunks = Math.floor(startingArraySize / randomChunkSize) + (expectedRemainder === 0 ? 0 : 1);
-      const startingArray = new Array(startingArraySize).fill(null);
-      const chunks = array_chunks(startingArray, randomChunkSize);
-      expect(chunks).to.have.lengthOf(Math.floor(expectedLengthOfChunks));
 
-      const lastItem = chunks.pop();
-      expect(lastItem).to.have.lengthOf(expectedRemainder);
+      for (let chunkSize = 1; chunkSize <= startingArraySize; ++chunkSize) {
+        let expectedRemainder = startingArraySize % chunkSize;
+        const expectedLengthOfChunks =
+          Math.floor(startingArraySize / chunkSize) +
+          (expectedRemainder === 0 ? 0 : 1);
+        expectedRemainder =
+          expectedRemainder === 0 ? chunkSize : expectedRemainder;
+        const startingArray = new Array(startingArraySize).fill(null);
+        const chunks = array_chunks(startingArray, chunkSize);
+        expect(chunks).to.have.lengthOf(Math.floor(expectedLengthOfChunks));
+
+        const lastItem = chunks.pop();
+        expect(lastItem).to.have.lengthOf(expectedRemainder);
+      }
     });
   });
 
@@ -88,16 +60,26 @@ describe('Helpers', () => {
 
     it('should handle timestamp', () => {
       const results = serializeSpecialTypes(special);
-      expect(results.timestamp.value).to.include.all.keys('_seconds', '_nanoseconds');
-    })
+      expect(results.timestamp.value).to.include.all.keys(
+        '_seconds',
+        '_nanoseconds'
+      );
+    });
   });
 
   describe('unserializeSpecialTypes', () => {
-    admin.initializeApp();
     const results = unserializeSpecialTypes(sampleExportedDoc);
-    expect(results.sampleExportedDoc.timestamp).to.be.an.instanceof(admin.firestore.Timestamp);
-    expect(results.sampleExportedDoc.geopoint).to.be.an.instanceof(admin.firestore.GeoPoint);
-    expect(results.sampleExportedDoc.documentRef).to.be.an.instanceof(admin.firestore.DocumentReference);
-    expect(results.sampleExportedDoc.documentRef).to.be.an.instanceof(admin.firestore.DocumentReference);
-  })
+    expect(results.sampleExportedDoc.timestamp).to.be.an.instanceof(
+      firestore.Timestamp
+    );
+    expect(results.sampleExportedDoc.geopoint).to.be.an.instanceof(
+      firestore.GeoPoint
+    );
+    expect(results.sampleExportedDoc.documentRef).to.be.an.instanceof(
+      firestore.DocumentReference
+    );
+    expect(results.sampleExportedDoc.documentRef).to.be.an.instanceof(
+      firestore.DocumentReference
+    );
+  });
 });
