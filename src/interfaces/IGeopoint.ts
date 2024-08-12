@@ -5,5 +5,5 @@ export interface IGeopoint extends ISpecialType {
   value: {
     _latitude: number;
     _longitude: number;
-  }
+  };
 }
